@@ -16,12 +16,29 @@
 #along with this program.  If not, see <https://www.gnu.org/licenses/>.
 umask 0022;
 set -uo pipefail;
+
+export DOS_WORKSPACE_ROOT=${GIT_LOCAL}"/DivestOS-Build/"; #XXX: Set to project root for this fork.
+source "$DOS_WORKSPACE_ROOT/Scripts/init.sh"
+
 source "$DOS_SCRIPTS_COMMON/Shell.sh";
 
 #Goal: Remove as many proprietary blobs without breaking core functionality
 #Outcome: Increased battery/performance/privacy/security, Decreased ROM size
 #TODO: Clean init*.rc files, Modularize, Remove more variants
 
+export DOS_BUILD_BASE=$LINEAGE_ROOT
+echo "DOS_BUILD_BASE=$DOS_BUILD_BASE"
+echo "DOS_DEBLOBBER_REMOVE_ACCESSORIES=$DOS_DEBLOBBER_REMOVE_ACCESSORIES"
+echo "DOS_DEBLOBBER_REMOVE_AUDIOFX=$DOS_DEBLOBBER_REMOVE_AUDIOFX"
+echo "DOS_DEBLOBBER_REMOVE_CNE=$DOS_DEBLOBBER_REMOVE_CNE"
+echo "DOS_DEBLOBBER_REMOVE_GRAPHICS=$DOS_DEBLOBBER_REMOVE_GRAPHICS"
+echo "DOS_DEBLOBBER_REMOVE_RENDERSCRIPT=$DOS_DEBLOBBER_REMOVE_RENDERSCRIPT"
+echo "DOS_DEBLOBBER_REMOVE_FP=$DOS_DEBLOBBER_REMOVE_FP"
+echo "DOS_DEBLOBBER_REMOVE_IMS=$DOS_DEBLOBBER_REMOVE_IMS"
+echo "DOS_DEBLOBBER_REMOVE_RCS=$DOS_DEBLOBBER_REMOVE_RCS"
+echo "DOS_DEBLOBBER_REMOVE_IPA=$DOS_DEBLOBBER_REMOVE_IPA"
+echo "DOS_DEBLOBBER_REMOVE_IR=$DOS_DEBLOBBER_REMOVE_IR"
+echo "DOS_DEBLOBBER_REPLACE_TIME=$DOS_DEBLOBBER_REPLACE_TIME"
 echo "Deblobbing...";
 
 #
@@ -273,7 +290,8 @@ echo "Deblobbing...";
 
 	#[Google]
 	blobs=$blobs"|TetheringEntitlement.apk|CarrierLocation.apk|CarrierWifi.apk";
-	blobs=$blobs"|CarrierSettings.apk|CarrierSetup.apk";
+	#blobs=$blobs"|CarrierSettings.apk"; #TODO carriersettings_extractor
+	blobs=$blobs"|CarrierSetup.apk";
 	blobs=$blobs"|CarrierServices.apk";
 	blobs=$blobs"|HardwareInfo.apk";
 	blobs=$blobs"|SCONE.apk"; #Adaptive Connectivity Services
@@ -690,8 +708,8 @@ deblobDevice() {
 	sed -i 's/BOARD_SUPPORTS_SOUND_TRIGGER_5514 := true/BOARD_SUPPORTS_SOUND_TRIGGER_5514 := false/' BoardConfig*.mk &>/dev/null || true;
 	if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i 's/AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := true/AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := false/' BoardConfig*.mk &>/dev/null || true; fi; #Disable Dolby
 	sed -i 's/BOARD_ANT_WIRELESS_DEVICE := true/BOARD_ANT_WIRELESS_DEVICE := false/' BoardConfig*.mk &>/dev/null || true; #Disable ANT
-	awk -i inplace '!/BOARD_ANT_WIRELESS_DEVICE/' BoardConfig*.mk &>/dev/null || true;
-	#awk -i inplace '!/RS_DRIVER/' BoardConfig*.mk &>/dev/null || true; #Renderscript
+	sed -i '/BOARD_ANT_WIRELESS_DEVICE/d' BoardConfig*.mk &>/dev/null || true;
+	#sed -i '!/RS_DRIVER/d' BoardConfig*.mk &>/dev/null || true; #Renderscript
 
 	sed -i '/loc.nlp_name/d' *.prop *.mk &>/dev/null || true; #Disable QC Location Provider
 	sed -i 's/drm.service.enabled=true/drm.service.enabled=false/' *.prop *.mk &>/dev/null || true;
@@ -730,7 +748,7 @@ deblobDevice() {
 		sed -i 's|<bool name="config_device_volte_available">true</bool>|<bool name="config_device_volte_available">false</bool>|' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
 		sed -i 's|<bool name="config_device_vt_available">true</bool>|<bool name="config_device_vt_available">false</bool>|' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
 		sed -i 's|<bool name="config_dynamic_bind_ims">true</bool>|<bool name="config_dynamic_bind_ims">false</bool>|' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
-		awk -i inplace '!/config_ims_package/' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
+		sed -i '/config_ims_package/d' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
 	fi;
 	if [ "$DOS_DEBLOBBER_REMOVE_IMS" = true ] || [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then
 		sed -i 's/data.iwlan.enable=true/data.iwlan.enable=false/' *.prop *.mk &>/dev/null || true;
@@ -761,11 +779,15 @@ deblobDevice() {
 			sed -i 's/property_set("persist.rcs.supported", ".");/property_set("persist.rcs.supported", "0");/' init/init_*.cpp; #Disable RCS
 		fi;
 	fi;
-	awk -i inplace '!/'$overlay'/' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
+  splitol=$(echo "$overlay" | tr "|" "\n")
+  for ol in $splitol
+  do
+    sed -i "/$ol/d" overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
+  done
 	sed -i 's|<bool name="config_enableWifiDisplay">true</bool>|<bool name="config_enableWifiDisplay">false</bool>|' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true;
 	sed -i 's|<bool name="config_uiBlurEnabled">true</bool>|<bool name="config_uiBlurEnabled">false</bool>|' overlay*/frameworks/base/core/res/res/values/config.xml &>/dev/null || true; #Disable UIBlur
-	awk -i inplace '!/platform_carrier_config_package/' overlay*/packages/services/Telephony/res/values/config.xml &>/dev/null || true;
-	awk -i inplace '!/config_show_adaptive_connectivity/' overlay*/packages/apps/Settings/res/values/config.xml &>/dev/null || true;
+	sed -i '/platform_carrier_config_package/d' overlay*/packages/services/Telephony/res/values/config.xml &>/dev/null || true;
+	sed -i '/config_show_adaptive_connectivity/d' overlay*/packages/apps/Settings/res/values/config.xml &>/dev/null || true;
 	if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then rm -f board/qcom-cne.mk product/qcom-cne.mk; fi; #Remove CNE
 	if [ "$DOS_DEBLOBBER_REMOVE_IMS" = true ]; then
 		rm -f rootdir/etc/init.qti.ims.sh rootdir/init.qti.ims.sh init.qti.ims.sh; #Remove IMS startup script
@@ -775,9 +797,17 @@ deblobDevice() {
 	if [ "$DOS_DEBLOBBER_REMOVE_IPA" = true ]; then rm -rf data-ipa-cfg-mgr; fi; #Remove IPA
 	rm -rf libshim_wvm libshimwvm libshims/wvm_shim.cpp; #Remove Google Widevine compatibility module
 	rm -rf board/qcom-wipower.mk product/qcom-wipower.mk; #Remove WiPower makefiles
-	#awk -i inplace '!/'$ipcSec'/' configs/sec_config &>/dev/null || true; #Remove all IPC security exceptions from sec_config
-	awk -i inplace '!/'$blobs'/' ./*proprietary*.txt &>/dev/null || true; #Remove all blob references from blob manifest
-	awk -i inplace '!/'$blobs'/' ./*/*proprietary*.txt &>/dev/null || true; #Remove all blob references from blob manifest location in subdirectory
+  #splitipcsec=$(echo "$ipcSec" | tr "|" "\n")
+  #for ipcsec in $splitipcsec
+  #do
+	#  sed -i "/$ipcsec/d" configs/sec_config &>/dev/null || true; #Remove all IPC security exceptions from sec_config
+  #done
+  splitblobs=$(echo "$blobs" | tr "|" "\n")
+  for blob in $splitblobs
+  do
+	  sed -i "/$blob/d" ./*proprietary*.txt &>/dev/null || true; #Remove all blob references from blob manifest
+	  sed -i "/$blob/d" ./*/*proprietary*.txt &>/dev/null || true; #Remove all blob references from blob manifest location in subdirectory
+  done
 	if [ -f setup-makefiles.sh ]; then
 		bash -c "cd $DOS_BUILD_BASE/$devicePath && ./setup-makefiles.sh" || true; #Update the makefiles
 	fi;
@@ -802,7 +832,11 @@ export -f deblobVendors;
 deblobVendorMk() {
 	local makefile="$1";
 	cd "$DOS_BUILD_BASE";
-	awk -i inplace '!/'$blobs'/' "$makefile"; #Remove all blob references from makefile
+  splitblobs=$(echo "$blobs" | tr "|" "\n")
+  for blob in $splitblobs
+  do
+    sed -i "/$blob/d" "$makefile"; #Remove all blob references from makefile
+  done
 }
 export -f deblobVendorMk;
 
@@ -810,9 +844,13 @@ deblobVendorBp() {
 	local bpfile="$1";
 	cd "$DOS_BUILD_BASE";
 	#TODO: remove these lines instead
-	sed -i -E "s/apk.*("$blobs").*/apk: \"proprietary\/priv-app\/qcrilmsgtunnel\/qcrilmsgtunnel.apk\", enabled: false,/g" "$bpfile";
-	sed -i -E "s/jars.*("$blobs").*/jars: \[\"proprietary\/system\/framework\/qcrilhook.jar\"\], enabled: false,/g" "$bpfile";
-	sed -i -E "s/srcs.*("$blobs").*/srcs: \[\"proprietary\/vendor\/lib\/libtime_genoff.so\"\], enabled: false,/g" "$bpfile";
+  splitblobs=$(echo "$blobs" | tr "|" "\n")
+  for blob in $splitblobs
+  do
+	  sed -i -E "s/apk.*("$blob").*/apk: \"proprietary\/priv-app\/qcrilmsgtunnel\/qcrilmsgtunnel.apk\", enabled: false,/g" "$bpfile";
+	  sed -i -E "s/jars.*("$blob").*/jars: \[\"proprietary\/system\/framework\/qcrilhook.jar\"\], enabled: false,/g" "$bpfile";
+	  sed -i -E "s/srcs.*("$blob").*/srcs: \[\"proprietary\/vendor\/lib\/libtime_genoff.so\"\], enabled: false,/g" "$bpfile";
+  done
 	#TODO make this work for more then these two blobs
 	#Credit: https://stackoverflow.com/a/26053127
 	sed -i ':a;N;s/\n/&/3;Ta;/manifest_android.hardware.drm@1.*-service.widevine.xml/!{P;D};:b;N;s/\n/&/8;Tb;d' "$bpfile";
@@ -835,10 +873,24 @@ export -f deblobVendorBp;
 #
 #START OF DEBLOBBING
 #
+
 cd "$DOS_BUILD_BASE";
-find build -name "*.mk" -type f -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'awk -i inplace "!/$makes/" "{}"'; #Deblob all makefiles
+for makefile in $(find build -name "*.mk" -type f)
+do
+  for blob in $(echo "$makes" | tr "|" "\n")
+  do
+    sed -i "/$blob/d" $makefile
+  done
+done
+for makefile in $(find device -name "*.mk" -type f)
+do
+  for blob in $(echo "$makes" | tr "|" "\n")
+  do
+    sed -i "/$blob/d" $makefile
+  done
+done
 find device -maxdepth 2 -mindepth 2 -type d -exec bash -c 'deblobDevice "$0"' {} \;; #Deblob all device directories
-find device -name "*.mk" -type f -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'awk -i inplace "!/$makes/" "{}"'; #Deblob all makefiles
+find device -name "*.mk" -type f -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'sed -i "/$makes/d" "{}"'; #Deblob all makefiles
 #find kernel -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'deblobKernel "{}"'; #Deblob all kernel directories
 find vendor -name "*endor*.mk" -type f -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'deblobVendorMk "{}"'; #Deblob all makefiles
 find vendor -name "Android.bp" -type f -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'deblobVendorBp "{}"'; #Deblob all makefiles
@@ -873,5 +925,18 @@ rm -rf packages/apps/ImsServiceEntitlement/* || true;
 #
 
 cd "$DOS_BUILD_BASE";
+
+#Apply gesture input lib here for now
+for codename in barbet blueline bramble coral crosshatch flame redfin
+do
+  if [[ -d vendor/google/"$codename" ]]; then
+    [[ ! -f libjni_latinimegoogle.so ]] && curl -LO https://gitlab.com/MindTheGapps/vendor_gapps/-/raw/tau/arm64/proprietary/product/lib64/libjni_latinimegoogle.so
+    cd vendor/google/"$codename"
+    mkdir -p proprietary/product/lib64 || true
+    cp "$DOS_BUILD_BASE"/libjni_latinimegoogle.so proprietary/product/lib64
+    printf "\nPRODUCT_COPY_FILES += vendor/google/$codename/proprietary/product/lib64/libjni_latinimegoogle.so:\$(TARGET_COPY_OUT_PRODUCT)/lib64/libjni_latinimegoogle.so\n" | tee -a $codename-vendor.mk; #Add gesture input to AOSP keyboard
+    cd "$DOS_BUILD_BASE"
+  fi
+done;
 
 echo -e "\e[0;32m[SCRIPT COMPLETE] Deblobbing complete\e[0m";
