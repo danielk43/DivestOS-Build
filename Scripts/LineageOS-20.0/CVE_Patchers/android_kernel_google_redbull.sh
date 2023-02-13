@@ -1,5 +1,6 @@
 #!/bin/bash
-if cd "$DOS_BUILD_BASE""kernel/google/redbull"; then
+if cd "$DOS_BUILD_BASE/kernel/google/redbull"; then
+git reset --hard && git clean -fdx
 git apply $DOS_PATCHES_LINUX_CVES/0001-LinuxIncrementals/4.19/4.19.0318-0319.patch --exclude=Makefile
 git apply $DOS_PATCHES_LINUX_CVES/0003-syzkaller-Misc/ANY/0008.patch
 git apply $DOS_PATCHES_LINUX_CVES/0003-syzkaller-Misc2/ANY/0001.patch
