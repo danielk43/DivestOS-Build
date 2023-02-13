@@ -1,5 +1,6 @@
 #!/bin/bash
-if cd "$DOS_BUILD_BASE""kernel/google/msm-4.9"; then
+if cd "$DOS_BUILD_BASE/kernel/google/msm-4.9"; then
+git reset --hard && git clean -fdx
 git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes-2024/4.9/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes-2024/4.9/0003.patch
 git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes-2024/4.9/0004.patch
