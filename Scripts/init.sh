@@ -21,18 +21,19 @@
 #START OF USER CONFIGURABLE OPTIONS
 #
 #General
-export DOS_WORKSPACE_ROOT="/mnt/dos/"; #XXX: THIS MUST BE CORRECT TO BUILD!
+#export DOS_WORKSPACE_ROOT="/mnt/dos/"; #XXX: THIS MUST BE CORRECT TO BUILD!
 #export DOS_BUILDS=$DOS_WORKSPACE_ROOT"Builds/";
-export DOS_BUILDS="/mnt/Storage-1/DivestOS/Builds/"; #XXX: THIS MUST BE CORRECT TO BUILD!
-export DOS_SIGNING_KEYS="$DOS_WORKSPACE_ROOT/Signing_Keys/4096pro";
-export DOS_SIGNING_GPG="$DOS_WORKSPACE_ROOT/Signing_Keys/gnupg";
+#export DOS_BUILDS="/mnt/Storage-1/DivestOS/Builds/"; #XXX: THIS MUST BE CORRECT TO BUILD!
+#export DOS_SIGNING_KEYS="$DOS_WORKSPACE_ROOT/Signing_Keys/4096pro";
+#export DOS_SIGNING_GPG="$DOS_WORKSPACE_ROOT/Signing_Keys/gnupg";
 #export USE_CCACHE=1;
 #export CCACHE_DIR="";
-export CCACHE_COMPRESS=1;
-export CCACHE_COMPRESSLEVEL=1;
+#export CCACHE_COMPRESS=1;
+#export CCACHE_COMPRESSLEVEL=1;
 #export DOS_BINARY_PATCHER="";
 export DOS_MALWARE_SCAN_ENABLED=false; #Set true to perform a fast scan on patchWorkspace() and a through scan on buildAll()
-export DOS_MALWARE_SCAN_SETTING="quick"; #buildAll() scan speed. Options: quick, extra, slow, full
+export DOS_MALWARE_SCAN_ENABLED=true; #Set true to perform a fast scan on patchWorkspace() and a through scan on buildAll()
+export DOS_MALWARE_SCAN_SETTING="full"; #buildAll() scan speed. Options: quick, extra, slow, full
 export DOS_REFRESH_PATCHES=true; #Set true to refresh branch-specific patches on apply
 
 #Deblobber
@@ -43,8 +44,8 @@ export DOS_DEBLOBBER_REMOVE_APTX=false; #Set true to remove aptX Bluetooth codec
 export DOS_DEBLOBBER_REMOVE_CNE=true; #Set true to remove all CNE blobs #XXX: Breaks Wi-Fi calling
 export DOS_DEBLOBBER_REMOVE_DPM=true; #Set true to remove all DPM blobs #XXX: Maybe breaks multi-sim and carrier aggregation (LTE+)
 export DOS_DEBLOBBER_REMOVE_DPP=false; #Set true to remove all Display Post Processing blobs #XXX: Breaks boot on select devices
-export DOS_DEBLOBBER_REMOVE_FACE=false; #Set true to remove all face unlock blobs
-export DOS_DEBLOBBER_REMOVE_FP=false; #Set true to remove all fingerprint reader blobs
+export DOS_DEBLOBBER_REMOVE_FACE=true; #Set true to remove all face unlock blobs
+export DOS_DEBLOBBER_REMOVE_FP=true; #Set true to remove all fingerprint reader blobs
 export DOS_DEBLOBBER_REMOVE_EUICC=true; #Set true to remove all Google eUICC blobs
 export DOS_DEBLOBBER_REMOVE_EUICC_FULL=false; #Set true to remove all hardware eUICC blobs
 export DOS_DEBLOBBER_REMOVE_IMS=false; #Set true to remove all IMS blobs #XXX: Carriers are phasing out 3G, making IMS mandatory for calls
@@ -103,8 +104,8 @@ export DOS_THEME_700="E64A19"; #Deep Orange 700
 #
 #END OF USER CONFIGURABLE OPTIONS
 #
-[ -f "$HOME/.divested.vars" ] && source $HOME/.divested.vars && echo "included $HOME/.divested.vars config"
-[ -f "$HOME/.divested.vars.${BDEVICE}" ] && source $HOME/.divested.vars.${BDEVICE} && echo "included $HOME/.divested.vars.${BDEVICE} config"
+# [ -f "$HOME/.divested.vars" ] && source $HOME/.divested.vars && echo "included $HOME/.divested.vars config"
+# [ -f "$HOME/.divested.vars.${BDEVICE}" ] && source $HOME/.divested.vars.${BDEVICE} && echo "included $HOME/.divested.vars.${BDEVICE} config"
 
 umask 0022;
 
@@ -123,16 +124,32 @@ gpgVerifyGitHead() {
 }
 export -f gpgVerifyGitHead;
 
-BUILD_WORKING_DIR=${PWD##*/};
-export DOS_VERSION="$BUILD_WORKING_DIR";
-if [ -d ".repo" ]; then
-	echo "Detected $BUILD_WORKING_DIR";
-else
-	echo "Not a valid workspace!";
-	return 1;
-fi;
+# dirname should should only contain alphanumeric, ".", "-"
+# only version must be numeric
 
-export DOS_BUILD_BASE="$DOS_WORKSPACE_ROOT/Build/$BUILD_WORKING_DIR/";
+os_name () {
+  if [[ -n ${ANDROID_BUILD_TOP} ]]; then
+    printf $(basename ${ANDROID_BUILD_TOP})
+  else
+    printf $(basename ${PWD})
+  fi
+}
+
+OS_NAME=$(os_name)
+os_version () {
+  printf ${OS_NAME##*-}
+}
+
+if [[ ${OS_NAME,,} =~ "lineage" ]]; then
+  BUILD_WORKING_DIR="LineageOS-$(os_version)"
+elif [[ ${OS_NAME,,} =~ "graphene" ]]; then
+  BUILD_WORKING_DIR="GrapheneOS-$(os_version)" # TODO: DOS patching for GrapheneOS?
+else
+  echo "OS_NAME is invalid; must contain 'lineage' or 'graphene'" && return 1
+fi
+
+export DOS_VERSION=$BUILD_WORKING_DIR;
+export DOS_BUILD_BASE=$ANDROID_BUILD_TOP; # DOS expects this to be at DivestOS-Build/Build/LineageOS-XX.X
 if [ ! -d "$DOS_BUILD_BASE" ]; then
 	echo "Path mismatch! Please update init.sh!";
 	return 1;
@@ -145,17 +162,17 @@ export DOS_TMP_GNUPG="$DOS_TMP_DIR/gnupg-$RANDOM";
 mkdir -p "$DOS_TMP_GNUPG";
 export GNUPGHOME="$DOS_TMP_GNUPG";
 chmod 700 "$DOS_TMP_GNUPG";
-export DOS_VERIFICATION_KEYRING="$DOS_WORKSPACE_ROOT/Misc/pubring.kbx";
+export DOS_VERIFICATION_KEYRING=$DOS_WORKSPACE_ROOT"/Misc/pubring.kbx";
 cp "$DOS_VERIFICATION_KEYRING" "$DOS_TMP_GNUPG/";
 
-export DOS_PREBUILT_APPS="$DOS_WORKSPACE_ROOT/PrebuiltApps/";
-export DOS_PATCHES_COMMON="$DOS_WORKSPACE_ROOT/Patches/Common/";
-export DOS_PATCHES="$DOS_WORKSPACE_ROOT/Patches/$BUILD_WORKING_DIR/";
-export DOS_PATCHES_LINUX_CVES="$DOS_WORKSPACE_ROOT/Patches/Linux/";
-export DOS_WALLPAPERS="$DOS_WORKSPACE_ROOT/Patches/Wallpapers/";
+export DOS_PREBUILT_APPS=$DOS_WORKSPACE_ROOT"/PrebuiltApps/";
+export DOS_PATCHES_COMMON=$DOS_WORKSPACE_ROOT"/Patches/Common/";
+export DOS_PATCHES=$DOS_WORKSPACE_ROOT"/Patches/$BUILD_WORKING_DIR/";
+export DOS_PATCHES_LINUX_CVES=$DOS_WORKSPACE_ROOT"/Patches/Linux/";
+#export DOS_WALLPAPERS=$DOS_WORKSPACE_ROOT"/Patches/Wallpapers/";
 
-export DOS_SCRIPTS_COMMON="$DOS_WORKSPACE_ROOT/Scripts/Common/";
-export DOS_SCRIPTS="$DOS_WORKSPACE_ROOT/Scripts/$BUILD_WORKING_DIR/";
+export DOS_SCRIPTS_COMMON=$DOS_WORKSPACE_ROOT"/Scripts/Common/";
+export DOS_SCRIPTS=$DOS_WORKSPACE_ROOT"/Scripts/$BUILD_WORKING_DIR/";
 if [ ! -d "$DOS_SCRIPTS" ]; then
 	echo "$BUILD_WORKING_DIR is not supported!";
 	return 1;
@@ -178,10 +195,10 @@ export LANG=C.UTF-8;
 if [[ "$DOS_VERSION" != "LineageOS-20.0" ]] && [[ "$DOS_VERSION" != "LineageOS-21.0" ]]; then export DOS_DEBLOBBER_REMOVE_EUICC_FULL=true; fi;
 
 #START OF VERIFICATION
-gpgVerifyGitHead "$DOS_WORKSPACE_ROOT";
-gpgVerifyGitHead "$DOS_PREBUILT_APPS";
-gpgVerifyGitHead "$DOS_PATCHES_LINUX_CVES";
-gpgVerifyGitHead "$DOS_WALLPAPERS";
+#gpgVerifyGitHead "$DOS_WORKSPACE_ROOT";
+#gpgVerifyGitHead "$DOS_PREBUILT_APPS";
+#gpgVerifyGitHead "$DOS_PATCHES_LINUX_CVES";
+#gpgVerifyGitHead "$DOS_WALLPAPERS";
 #END OF VERIFICATION
 
 source "$DOS_SCRIPTS_COMMON/Shell.sh";
@@ -189,7 +206,7 @@ source "$DOS_SCRIPTS_COMMON/Functions.sh";
 source "$DOS_SCRIPTS_COMMON/Tag_Verifier.sh";
 source "$DOS_SCRIPTS/Functions.sh";
 
-[[ -f "$DOS_BUILD_BASE/.repo/local_manifests/roomservice.xml" ]] && echo "roomservice manifest found! Please fix your manifests before continuing!";
-[[ -f "$DOS_BUILD_BASE/DOS_PATCHED_FLAG" ]] && echo "NOTE: THIS WORKSPACE IS ALREADY PATCHED, PLEASE RESET BEFORE PATCHING AGAIN!";
+[[ -f "$DOS_BUILD_BASE/.repo/local_manifests/roomservice.xml" ]] && echo "roomservice manifest found! Please fix your manifests before continuing!" || true;
+[[ -f "$DOS_BUILD_BASE/DOS_PATCHED_FLAG" ]] && echo "NOTE: THIS WORKSPACE IS ALREADY PATCHED, PLEASE RESET BEFORE PATCHING AGAIN!" || true;
 
 if grep -sq "orphan_file" "/etc/mke2fs.conf"; then echo "NOTE: YOU MUST REMOVE orphan_file AND metadata_csum_seed FROM /etc/mke2fs.conf"; fi;
