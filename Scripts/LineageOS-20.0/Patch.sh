@@ -193,6 +193,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0041-tile_restrictions.patch"; 
 applyPatch "$DOS_PATCHES/android_frameworks_base/0042-minimal_screenshot_exif.patch"; #Put bare minimum metadata in screenshots (CalyxOS)
 #applyPatch "$DOS_PATCHES/android_frameworks_base/0043-Smart_Pixels.patch"; #Smart Pixels (various)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0037-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS)
 hardenLocationConf services/core/java/com/android/server/location/gnss/gps_debug.conf; #Harden the default GPS config
 sed -i 's/DEFAULT_USE_COMPACTION = false;/DEFAULT_USE_COMPACTION = true;/' services/core/java/com/android/server/am/CachedAppOptimizer.java; #Enable app compaction by default (GrapheneOS)
 sed -i 's/DEFAULT_MAX_FILES = 1000;/DEFAULT_MAX_FILES = 0;/' services/core/java/com/android/server/DropBoxManagerService.java; #Disable DropBox internal logging service
