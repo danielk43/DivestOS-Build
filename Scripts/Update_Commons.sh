@@ -15,7 +15,7 @@
 #You should have received a copy of the GNU Affero General Public License
 #along with this program.  If not, see <https://www.gnu.org/licenses/>.
 umask 0022;
-set -uo pipefail;
+set -eu pipefail;
 
 #APN List
 wget "https://github.com/LineageOS/android_vendor_lineage/raw/lineage-21.0/prebuilt/common/etc/apns-conf.xml" -O ../Patches/Common/apns-conf.xml;

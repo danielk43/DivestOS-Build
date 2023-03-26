@@ -16,7 +16,9 @@
 #along with this program.  If not, see <https://www.gnu.org/licenses/>.
 umask 0022;
 set -euo pipefail;
-source "$DOS_SCRIPTS_COMMON/Shell.sh";
+
+export DOS_WORKSPACE_ROOT=${GIT_LOCAL}"/DivestOS-Build/"; #XXX: Set to project root for this fork.
+source "$DOS_WORKSPACE_ROOT/Scripts/init.sh"
 
 #Last verified: 2022-10-15
 
@@ -48,13 +50,13 @@ cd "$DOS_BUILD_BASE";
 #START OF ROM CHANGES
 #
 
-#top dir
-cp -r "$DOS_PREBUILT_APPS/Fennec_DOS-Shim" "$DOS_BUILD_BASE/packages/apps/"; #Add a shim to install Fennec DOS without actually including the large APK
-cp -r "$DOS_PREBUILT_APPS/SupportDivestOS" "$DOS_BUILD_BASE/packages/apps/"; #Add the Support app
-cp -r "$DOS_PREBUILT_APPS/OpenEUICC" "$DOS_BUILD_BASE/packages/apps/"; #Add the OpenEUICC app
-gpgVerifyDirectory "$DOS_PREBUILT_APPS/android_vendor_FDroid_PrebuiltApps/packages";
-cp -r "$DOS_PREBUILT_APPS/android_vendor_FDroid_PrebuiltApps/." "$DOS_BUILD_BASE/vendor/fdroid_prebuilt/"; #Add the prebuilt apps
-cp -r "$DOS_PATCHES_COMMON/android_vendor_divested/." "$DOS_BUILD_BASE/vendor/divested/"; #Add our vendor files
+# #top dir
+# cp -r "$DOS_PREBUILT_APPS/Fennec_DOS-Shim" "$DOS_BUILD_BASE/packages/apps/"; #Add a shim to install Fennec DOS without actually including the large APK
+# cp -r "$DOS_PREBUILT_APPS/SupportDivestOS" "$DOS_BUILD_BASE/packages/apps/"; #Add the Support app
+# cp -r "$DOS_PREBUILT_APPS/OpenEUICC" "$DOS_BUILD_BASE/packages/apps/"; #Add the OpenEUICC app
+# gpgVerifyDirectory "$DOS_PREBUILT_APPS/android_vendor_FDroid_PrebuiltApps/packages";
+# cp -r "$DOS_PREBUILT_APPS/android_vendor_FDroid_PrebuiltApps/." "$DOS_BUILD_BASE/vendor/fdroid_prebuilt/"; #Add the prebuilt apps
+# cp -r "$DOS_PATCHES_COMMON/android_vendor_divested/." "$DOS_BUILD_BASE/vendor/divested/"; #Add our vendor files
 
 if enterAndClear "art"; then
 applyPatch "$DOS_PATCHES/android_art/0001-constify_JNINativeMethod.patch"; #Constify JNINativeMethod tables (GrapheneOS)
@@ -63,8 +65,8 @@ fi;
 if enterAndClear "bionic"; then
 applyPatch "$DOS_PATCHES/android_bionic/0001-HM-Use_HM.patch"; #(GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-1.patch"; #Add a real explicit_bzero implementation (GrapheneOS)
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-2.patch"; #Replace brk and sbrk with stubs (GrapheneOS) #XXX: some vendor blobs use sbrk
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-3.patch"; #Use blocking getrandom and avoid urandom fallback (GrapheneOS) #XXX: some kernels do not have (working) getrandom
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-2.patch"; #Replace brk and sbrk with stubs (GrapheneOS) #XXX: some vendor blobs use sbrk
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-3.patch"; #Use blocking getrandom and avoid urandom fallback (GrapheneOS) #XXX: some kernels do not have (working) getrandom
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-4.patch"; #Fix undefined out-of-bounds accesses in sched.h (GrapheneOS)
 if [ "$DOS_USE_KSM" = false ]; then applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-5.patch"; fi; #Stop implicitly marking mappings as mergeable (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-6.patch"; #Replace VLA formatting with dprintf-like function (GrapheneOS)
@@ -73,11 +75,11 @@ applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-8.patch";
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-9.patch"; #On 64-bit, zero the leading stack canary byte (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-10.patch"; #Switch pthread_atfork handler allocation to mmap (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-11.patch"; #Add memory protection for pthread_atfork handlers (GrapheneOS)
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-12.patch"; #Add XOR mangling mitigation for thread-local dtors (GrapheneOS) #XXX: patches from here on are known to cause boot issues
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-13.patch"; #Use a better pthread_attr junk filling pattern (GrapheneOS)
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-14.patch"; #Add guard page(s) between static_tls and stack (GrapheneOS)
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-15.patch"; #Move pthread_internal_t behind guard page (GrapheneOS)
-#applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-16.patch"; #Add secondary stack randomization (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-12.patch"; #Add XOR mangling mitigation for thread-local dtors (GrapheneOS) #XXX: patches from here on are known to cause boot issues (but at least not on Pixel series)
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-13.patch"; #Use a better pthread_attr junk filling pattern (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-14.patch"; #Add guard page(s) between static_tls and stack (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-15.patch"; #Move pthread_internal_t behind guard page (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_bionic/0002-Graphene_Bionic_Hardening-16.patch"; #Add secondary stack randomization (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_bionic/0003-Hosts_Cache.patch"; #Sort and cache hosts file data for fast lookup (tdm)
 applyPatch "$DOS_PATCHES/android_bionic/0003-Hosts_Wildcards.patch"; #Support wildcards in cached hosts file (tdm)
 applyPatch "$DOS_PATCHES/android_bionic/0004-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (DivestOS)
@@ -94,6 +96,9 @@ applyPatch "$DOS_PATCHES/android_build/0003-Exec_Based_Spawning.patch"; #Add exe
 applyPatch "$DOS_PATCHES/android_build/0004-Selective_APEX.patch"; #Only enable APEX on 6th/7th gen Pixel devices (GrapheneOS)
 sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_util.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
+sed -i "/Camera2/d" target/product/handheld_product.mk;
+sed -i "/android.hardware.biometrics.fingerprint/d" target/product/generic_system.mk;
+[[ -n ${AVB} ]] && applyPatch "$DOS_PATCHES/android_build/0002-Patch-makefile-for-custom-avb.patch"; #Add support for custom AVB key
 fi;
 
 if enterAndClear "build/soong"; then
@@ -115,6 +120,11 @@ applyPatch "$DOS_PATCHES/android_external_expat/0002-lib-Detect-integer-overflow
 applyPatch "$DOS_PATCHES/android_external_expat/0003-lib-Detect-integer-overflow-in-function-nextScaffold.patch";
 applyPatch "$DOS_PATCHES/android_external_expat/0004-lib-xmlparse.c-Detect-billion-laughs-attack-with-iso.patch";
 applyPatch "$DOS_PATCHES/android_external_expat/0005-lib-Stop-leaking-opening-tag-bindings-after-closing-.patch";
+fi;
+
+if enterAndClear "external/SecureCamera"; then
+sed -i '/LOCAL_MODULE/s/Camera/SecureCamera/' Android.mk; #Change module name
+sed -i '11iLOCAL_OVERRIDES_PACKAGES := Aperture Camera Camera2 LegacyCamera Snap OpenCamera' Android.mk; #Replace the others
 fi;
 
 if enterAndClear "external/hardened_malloc"; then
@@ -193,7 +203,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0041-tile_restrictions.patch"; 
 applyPatch "$DOS_PATCHES/android_frameworks_base/0042-minimal_screenshot_exif.patch"; #Put bare minimum metadata in screenshots (CalyxOS)
 #applyPatch "$DOS_PATCHES/android_frameworks_base/0043-Smart_Pixels.patch"; #Smart Pixels (various)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0037-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0039-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS)
 hardenLocationConf services/core/java/com/android/server/location/gnss/gps_debug.conf; #Harden the default GPS config
 sed -i 's/DEFAULT_USE_COMPACTION = false;/DEFAULT_USE_COMPACTION = true;/' services/core/java/com/android/server/am/CachedAppOptimizer.java; #Enable app compaction by default (GrapheneOS)
 sed -i 's/DEFAULT_MAX_FILES = 1000;/DEFAULT_MAX_FILES = 0;/' services/core/java/com/android/server/DropBoxManagerService.java; #Disable DropBox internal logging service
@@ -205,6 +215,7 @@ sed -i 's/MAX_PASSWORD_LENGTH = 16/MAX_PASSWORD_LENGTH = 64/' core/java/android/
 sed -i 's/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 72 \* 60 \* 60 \* 1000;/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 12 * 60 * 60 * 1000;/' core/java/android/app/admin/DevicePolicyManager.java; #Decrease the strong auth prompt timeout to occur more often
 #rm -rf packages/CompanionDeviceManager; #Used to support Android Wear (which hard depends on GMS)
 rm -rf packages/PrintRecommendationService; #Creates popups to install proprietary print apps
+sed -i 's/time.android.com/us.pool.ntp.org/' core/res/res/values/config.xml; #Use non-Android ntp pool
 fi;
 
 if enterAndClear "frameworks/ex"; then
@@ -267,7 +278,7 @@ fi;
 
 if enterAndClear "lineage-sdk"; then
 applyPatch "$DOS_PATCHES/android_lineage-sdk/0001-Private_DNS-Migration.patch"; #Migrate Private DNS preset modes to hostname-mode based (heavily based off of a CalyxOS patch)
-if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then awk -i inplace '!/LineageAudioService/' lineage/res/res/values/config.xml; fi; #Remove AudioFX
+if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i "/LineageAudioService/d" lineage/res/res/values/config.xml; fi; #Remove AudioFX
 fi;
 
 if enterAndClear "packages/apps/Aperture"; then
@@ -335,6 +346,7 @@ if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$D
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels.patch"; #Smart Pixels (CarbonROM/various)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels-a1.patch"; #Fix long click intent for Smart Pixels tile (crDroid/various)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
@@ -345,11 +357,11 @@ if enterAndClear "packages/apps/ThemePicker"; then
 git revert --no-edit fcf658d2005dc557a95d5a7fb89cb90d06b31d33; #grant permission by default, to prevent crashes, missing previews, and confusion
 fi;
 
-if enterAndClear "packages/apps/Trebuchet"; then
-git am $DOS_PATCHES/ASB-2023-10/launcher-*.patch;
-applyPatch "$DOS_PATCHES/android_packages_apps_Trebuchet/361248.patch"; #Launcher3: Allow toggling monochrome icons for all apps
-cp $DOS_BUILD_BASE/vendor/divested/overlay/common/packages/apps/Trebuchet/res/xml/default_workspace_*.xml res/xml/; #XXX: Likely no longer needed
-fi;
+# if enterAndClear "packages/apps/Trebuchet"; then
+# git am $DOS_PATCHES/ASB-2023-10/launcher-*.patch;
+# applyPatch "$DOS_PATCHES/android_packages_apps_Trebuchet/361248.patch"; #Launcher3: Allow toggling monochrome icons for all apps
+# cp $DOS_BUILD_BASE/vendor/divested/overlay/common/packages/apps/Trebuchet/res/xml/default_workspace_*.xml res/xml/; #XXX: Likely no longer needed
+# fi;
 
 if enterAndClear "packages/apps/Updater"; then
 applyPatch "$DOS_PATCHES/android_packages_apps_Updater/0001-Server.patch"; #Switch to our server (DivestOS)
@@ -435,8 +447,8 @@ patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --direct
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/30.0";
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/29.0";
 patch -p1 < "$DOS_PATCHES/android_system_sepolicy/0001-LGE_Fixes.patch" --directory="prebuilts/api/28.0";
-awk -i inplace '!/true cannot be used in user builds/' Android.mk; #Allow ignoring neverallows under -user
-awk -i inplace '!/domain=gmscore_app/' private/seapp_contexts prebuilts/api/*/private/seapp_contexts; #Disable unused gmscore_app domain (GrapheneOS)
+sed -i '/true cannot be used in user builds/d' Android.mk; #Allow ignoring neverallows under -user
+sed -i "/domain=gmscore_app/d" private/seapp_contexts prebuilts/api/*/private/seapp_contexts; #Disable unused gmscore_app domain (GrapheneOS)
 fi;
 
 if enterAndClear "system/update_engine"; then
@@ -448,40 +460,47 @@ rm build/target/product/security/lineage.x509.pem; #Remove Lineage keys
 rm -rf overlay/common/lineage-sdk/packages/LineageSettingsProvider/res/values/defaults.xml; #Remove analytics
 rm -rf overlay/common/frameworks/base/core/res/res/drawable-*/default_wallpaper.png; #Remove Lineage wallpaper
 rm -rf overlay/rro_packages/NetworkStackOverlay; #Do not set device model as DHCP hostname
-if [ "$DOS_HOSTS_BLOCKING" = true ]; then awk -i inplace '!/50-lineage.sh/' config/*.mk; fi; #Make sure our hosts is always used
-awk -i inplace '!/PRODUCT_EXTRA_RECOVERY_KEYS/' config/*.mk; #Remove Lineage extra keys
-awk -i inplace '!/security\/lineage/' config/*.mk; #Remove Lineage extra keys
-awk -i inplace '!/config_multiuserMaximumUsers/' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
+if [ "$DOS_HOSTS_BLOCKING" = true ]; then sed -i '/50-lineage.sh/d' config/*.mk; fi; #Make sure our hosts is always used
+sed -i '/PRODUCT_EXTRA_RECOVERY_KEYS/d' config/*.mk; #Remove Lineage extra keys
+sed -i '/security\/lineage/d' config/*.mk; #Remove Lineage extra keys
+sed -i '/config_multiuserMaximumUsers/d' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
 sed -i '/config_locationExtraPackageNames/,+11d' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
-awk -i inplace '!/def_backup_transport/' overlay/common/frameworks/base/packages/SettingsProvider/res/values/defaults.xml; #Unset default backup provider
+sed -i '/def_backup_transport/d' overlay/common/frameworks/base/packages/SettingsProvider/res/values/defaults.xml; #Unset default backup provider
 if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUDIOFX/,+3d' config/common_full.mk; fi; #Remove AudioFX
-sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
-echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our customizations
-cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
+#sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
+#echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our customizations
+#cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
 cp -f "$DOS_PATCHES_COMMON/sensitive_pn.xml" prebuilt/common/etc/sensitive_pn.xml; #Update helplines
-awk -i inplace '!/Eleven/' config/common_full.mk; #Remove Music Player
-awk -i inplace '!/enforce-product-packages-exist-internal/' config/common.mk; #Ignore missing packages
-cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
-awk -i inplace '!/com.android.vending/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
-awk -i inplace '!/com.google.android/' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
+sed -i '/Eleven/d' config/common_full.mk; #Remove Music Player
+sed -i '/enforce-product-packages-exist-internal/d' config/common.mk; #Ignore missing packages
+#cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
+sed -i '/com.android.vending/d' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
+sed -i '/com.google.android/d' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
+sed -i "s/Aperture/SecureCamera/" config/common_full.mk;
+sed -i "s/org.lineageos.aperture/app.grapheneos.camera/" overlay/common/frameworks/base/core/res/res/values/config.xml;
+sed -i "/Filter out random types/,/endif/d" config/version.mk; #Allow custom build types
+sed -i "s/Jelly/TrichromeChrome TrichromeLibrary TrichromeWebView/" config/common_mobile.mk; #Replace Jelly with Cromite browser
+[[ ! "${WITH_GMS}" = true ]] && printf "\n\nPRODUCT_PACKAGES += Obtainium PdfViewer" | tee -a config/common_mobile.mk; #Add additional apks from android_vendor_partner_gms
+applyPatch "$DOS_PATCHES/android_vendor_lineage/0001-Update-webview-providers.patch"; #Allowlist webviews
 fi;
 
-if enter "vendor/divested"; then
-awk -i inplace '!/_lookup/' overlay/common/lineage-sdk/packages/LineageSettingsProvider/res/values/defaults.xml; #Remove all lookup provider overrides
-echo "PRODUCT_PACKAGES += eSpeakNG" >> packages.mk; #PicoTTS needs work to compile on 18.1, use eSpeak-NG instead
-if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then echo "PRODUCT_PACKAGES += OpenEUICC" >> packages.mk; fi;
-sed -i 's/OpenCamera/Aperture/' packages.mk; #Use the LineageOS camera app
-awk -i inplace '!/speed-profile/' build/target/product/lowram.mk; #breaks compile on some dexpreopt devices
-sed -i 's/wifi,cell/internet/' overlay/common/frameworks/base/packages/SystemUI/res/values/config.xml; #Use the modern quick tile
-sed -i 's|system/etc|$(TARGET_COPY_OUT_PRODUCT)/etc|' divestos.mk;
-if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then
-echo "Including CarrierConfig2 & CarrierSettings2";
-echo 'ifneq ($(BOARD_WITHOUT_RADIO),true)' >> divestos.mk;
-echo "PRODUCT_PACKAGES += CarrierConfig2"  >> divestos.mk;
-echo "include vendor/divested-carriersettings/CarrierSettings2.mk" >> divestos.mk;
-echo "endif" >> divestos.mk;
-fi;
-fi;
+# if enter "vendor/divested"; then
+# sed -i '/_lookup/d' overlay/common/lineage-sdk/packages/LineageSettingsProvider/res/values/defaults.xml; #Remove all lookup provider overrides
+# echo "PRODUCT_PACKAGES += eSpeakNG" >> packages.mk; #PicoTTS needs work to compile on 18.1, use eSpeak-NG instead
+# if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then echo "PRODUCT_PACKAGES += OpenEUICC" >> packages.mk; fi;
+# sed -i 's/OpenCamera/Aperture/' packages.mk; #Use the LineageOS camera app
+# sed -i '!/speed-profile/' build/target/product/lowram.mk; #breaks compile on some dexpreopt devices
+# sed -i 's/wifi,cell/internet/' overlay/common/frameworks/base/packages/SystemUI/res/values/config.xml; #Use the modern quick tile
+# sed -i 's|system/etc|$(TARGET_COPY_OUT_PRODUCT)/etc|' divestos.mk;
+# if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then
+# echo "Including CarrierConfig2 & CarrierSettings2";
+# echo 'ifneq ($(BOARD_WITHOUT_RADIO),true)' >> divestos.mk;
+# echo "PRODUCT_PACKAGES += CarrierConfig2"  >> divestos.mk;
+# echo "include vendor/divested-carriersettings/CarrierSettings2.mk" >> divestos.mk;
+# echo "endif" >> divestos.mk;
+# fi;
+# fi;
+
 #
 #END OF ROM CHANGES
 #
@@ -497,19 +516,30 @@ if enterAndClear "device/fxtec/pro1"; then
 echo "type qti_debugfs, fs_type, debugfs_type;" >> sepolicy/vendor/file.te; #fixup
 fi;
 
+for codename in barbet bramble coral crosshatch gs101 gs201 pantah raviole redbull redfin
+do
+  if enterAndClear "device/google/$codename"; then
+    (sed -i "/PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS/d" aosp_$codename.mk aosp_common.mk; git commit -am "Disable mainline checking") || true
+    for patch in "$DOS_PATCHES"/android_device_google_"$codename"/*.patch
+    do
+      applyPatch "$patch"
+    done
+  fi
+done;
+
 if enterAndClear "device/google/gs101"; then
-git revert --no-edit 371473c97a3769f9b0629b33ae7014e78e1e31bb; #potential breakage
+# git revert --no-edit 371473c97a3769f9b0629b33ae7014e78e1e31bb; #potential breakage;
 if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then sed -i '/google iwlan/,+8d' device.mk; fi; #fix stray
 fi;
 
 if enterAndClear "device/google/gs201"; then
 if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then sed -i '/google iwlan/,+8d' device.mk; fi; #fix stray
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC" = true ]; then sed -i '/eSIM MEP/,+4d' device.mk; fi; #fix stray
-awk -i inplace '!/PRODUCT_PACKAGES/' widevine/device.mk;
+  sed -i "/PRODUCT_PACKAGES/,+2d" widevine/device.mk || true;
 fi;
 
 if enterAndClear "device/google/redbull"; then
-awk -i inplace '!/sctp/' BoardConfig-common.mk modules.load; #fix compile after hardenDefconfig
+sed -i '/sctp/d' BoardConfig-common.mk modules.load; #fix compile after hardenDefconfig
 fi;
 
 if enterAndClear "device/google/muskie"; then
@@ -535,9 +565,9 @@ echo "type sensors_data_file, file_type, data_file_type, core_data_file_type;" >
 fi;
 
 if enterAndClear "device/oneplus/msm8998-common"; then
-#awk -i inplace '!/TARGET_RELEASETOOLS_EXTENSIONS/' BoardConfigCommon.mk; #disable releasetools to fix delta ota generation
+#sed -i "/TARGET_RELEASETOOLS_EXTENSIONS/d" BoardConfigCommon.mk; #disable releasetools to fix delta ota generation
 sed -i '/PRODUCT_SYSTEM_VERITY_PARTITION/iPRODUCT_VENDOR_VERITY_PARTITION := /dev/block/bootdevice/by-name/vendor' common.mk; #Support verity on /vendor too
-awk -i inplace '!/vendor_sensors_dbg_prop/' sepolicy/vendor/hal_camera_default.te; #fixup
+sed -i "/vendor_sensors_dbg_prop/d" sepolicy/vendor/hal_camera_default.te; #fixup
 echo "type qti_debugfs, fs_type, debugfs_type;" >> sepolicy/vendor/file.te; #fixup
 fi;
 
@@ -557,6 +587,29 @@ if enterAndClear "kernel/fairphone/sdm632"; then
 sed -i 's|/../../prebuilts/tools-lineage|/../../../prebuilts/tools-lineage|' lib/Makefile; #fixup typo
 fi;
 
+#Patch pixel kernels here for now
+for kernel in "msm-4.9" "msm-4.14" "redbull" "gs101_private_gs-google" "gs201_private_gs-google"
+do
+  kernel_dir=$(printf $kernel | sed "s#_#/#g")
+  if enterAndClear "kernel/google/$kernel_dir"; then
+    "${GIT_LOCAL}"/DivestOS-Build/Scripts/"${BUILD_WORKING_DIR}"/CVE_Patchers/android_kernel_google_$kernel.sh
+  fi
+done;
+
+cd "$DOS_BUILD_BASE"
+#Apply gesture input lib here for now
+for codename in barbet blueline bramble coral crosshatch flame panther raven redfin
+do
+  if [[ -d vendor/google/"$codename" ]]; then
+    [[ ! -f libjni_latinimegoogle.so ]] && curl -LO https://gitlab.com/MindTheGapps/vendor_gapps/-/raw/tau/arm64/proprietary/product/lib64/libjni_latinimegoogle.so
+    cd vendor/google/"$codename"
+    mkdir -p proprietary/product/lib64 || true
+    cp "$DOS_BUILD_BASE"/libjni_latinimegoogle.so proprietary/product/lib64
+    printf "\nPRODUCT_COPY_FILES += vendor/google/$codename/proprietary/product/lib64/libjni_latinimegoogle.so:\$(TARGET_COPY_OUT_PRODUCT)/lib64/libjni_latinimegoogle.so\n" | tee -a $codename-vendor.mk; #Add gesture input to AOSP keyboard
+    cd "$DOS_BUILD_BASE"
+  fi
+done;
+
 #Make changes to all devices
 cd "$DOS_BUILD_BASE";
 find "hardware/qcom/gps" -name "gps\.conf" -type f -print0 | xargs -0 -n 1 -P 4 -I {} bash -c 'hardenLocationConf "{}"';
@@ -572,13 +625,14 @@ find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {}
 find "device" -maxdepth 2 -mindepth 2 -type d -print0 | xargs -0 -n 1 -P 8 -I {} bash -c 'disableEnforceRRO "{}"';
 cd "$DOS_BUILD_BASE";
 deblobAudio;
-removeBuildFingerprints;
+#removeBuildFingerprints;
 hardenLocationSerials || true;
 enableAutoVarInit || true;
 changeDefaultDNS; #Change the default DNS servers
 fixupCarrierConfigs || true; #Remove silly carrier restrictions
 removeUntrustedCerts || true;
 sed -i 's/SSLv23_NO_TLSv1_2/TLSv1_2/' device/*/*/gps*xml* device/*/*/location/gps*xml* device/*/*/gnss/*/config/gps*xml* || true; #Enforce TLSv1.2 for SUPL on Tensor devices (GrapheneOS)
+[[ -n ${AVB} ]] && source "$DOS_SCRIPTS_COMMON/Enable_Verity.sh"
 cd "$DOS_BUILD_BASE";
 #rm -rfv device/*/*/overlay/CarrierConfigResCommon device/*/*/rro_overlays/CarrierConfigOverlay device/*/*/overlay/packages/apps/CarrierConfig/res/xml/vendor.xml;
 
@@ -621,7 +675,7 @@ enableLowRam "device/xiaomi/Mi8937" "Mi8937";
 
 #Fix broken options enabled by hardenDefconfig()
 [[ -d kernel/fairphone/sdm632 ]] && sed -i "s/CONFIG_PREEMPT_TRACER=n/CONFIG_PREEMPT_TRACER=y/" kernel/fairphone/sdm632/arch/arm64/configs/lineageos_*_defconfig; #Breaks on compile
-[[ -d kernel/google/msm-4.9 ]] && sed -i "s/CONFIG_DEBUG_NOTIFIERS=y/# CONFIG_DEBUG_NOTIFIERS is not set/" kernel/google/msm-4.9/arch/arm64/configs/*_defconfig; #Likely breaks boot
+#[[ -d kernel/google/msm-4.9 ]] && sed -i "s/CONFIG_DEBUG_NOTIFIERS=y/# CONFIG_DEBUG_NOTIFIERS is not set/" kernel/google/msm-4.9/arch/arm64/configs/*_defconfig; #Likely breaks boot
 [[ -d kernel/google/msm-4.14 ]] && sed -i "s/CONFIG_FORTIFY_SOURCE=y/# CONFIG_FORTIFY_SOURCE is not set/" kernel/google/msm-4.14/arch/arm64/configs/*_defconfig; #breaks compile
 [[ -d kernel/google/msm-4.14 ]] && sed -i "s/CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY=y/# CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY is not set/" kernel/google/msm-4.14/arch/arm64/configs/*_defconfig; #impartial backport
 [[ -d kernel/oneplus/sm8150 ]] && echo -e "\nCONFIG_DEBUG_FS=y" >> kernel/oneplus/sm8150/arch/arm64/configs/vendor/sm8150-perf_defconfig; #compile failure
@@ -636,14 +690,14 @@ sed -i 's/^YYLTYPE yylloc;/extern YYLTYPE yylloc;/' kernel/*/*/scripts/dtc/dtc-l
 rm -v kernel/*/*/drivers/staging/greybus/tools/Android.mk || true;
 rm -v kernel/*/*/*/*/drivers/staging/greybus/tools/Android.mk || true;
 rm -v device/*/*/overlay/frameworks/base/packages/overlays/NoCutoutOverlay/res/values/config.xml || true;
-awk -i inplace '!/BOARD_AVB_ENABLE := false/' device/*/*/*.mk; #revert Lineage's signing hack
+sed -i '/BOARD_AVB_ENABLE := false/d' device/*/*/*.mk; #revert Lineage's signing hack
 
 #Remove broken? charge control feature
-awk -i inplace '!/hardware\/google\/pixel\/lineage_health\/device/' device/*/*/*.mk;
-awk -i inplace '!/vendor.lineage.health-service.default/' device/*/*/*.mk;
+sed -i '/hardware\/google\/pixel\/lineage_health\/device/d' device/*/*/*.mk;
+sed -i '/vendor.lineage.health-service.default/d' device/*/*/*.mk;
 
 #Don't trip rollback protection after October update
-sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk;
+sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk || true;
 
 #
 #END OF DEVICE CHANGES

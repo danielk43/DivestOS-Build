@@ -24,7 +24,7 @@ export -f startPatcher;
 resetWorkspace() {
 	umask 0022;
 	if [ "$1" == "local" ]; then local noNetwork="--local-only"; fi;
-	repo forall -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync --jobs-network=6 --jobs-checkout=12 --force-sync --detach $noNetwork;
+	repo forall -c 'git add -A && git reset --hard' && rm -rf out DOS_PATCHED_FLAG && repo sync -j$(nproc) --force-sync --detach $noNetwork;
 	repo forall -v -c 'echo "$REPO_PATH $(git rev-parse HEAD)"' | sort -u > "$DOS_WORKSPACE_ROOT/Logs/resetWorkspace-$DOS_VERSION.txt";
 }
 export -f resetWorkspace;
@@ -495,8 +495,8 @@ export -f pushToServer;
 
 removeBuildFingerprints() {
 	#Removes the stock/vendor fingerprint, allowing one to be generated instead
-	find device -maxdepth 3 -name "lineage*.mk" -type f -exec sh -c "awk -i inplace '!/BUILD_FINGERPRINT/' {}" \;
-	find device -maxdepth 3 -name "lineage*.mk" -type f -exec sh -c "awk -i inplace '!/PRIVATE_BUILD_DESC/' {}" \;
+	find device -maxdepth 3 -name "lineage*.mk" -type f -exec sh -c "sed -i '/BUILD_FINGERPRINT/d' {}" \;
+	find device -maxdepth 3 -name "lineage*.mk" -type f -exec sh -c "sed -i '/PRIVATE_BUILD_DESC/d' {}" \;
 	echo "Removed stock build fingerprints";
 }
 export -f removeBuildFingerprints;
@@ -530,11 +530,11 @@ smallerSystem() {
 export -f smallerSystem;
 
 deblobAudio() {
-	awk -i inplace '!/BOARD_SUPPORTS_SOUND_TRIGGER/' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
-	awk -i inplace '!/android.hardware.soundtrigger/' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
+	sed -i '/BOARD_SUPPORTS_SOUND_TRIGGER/d' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
+	sed -i '/android.hardware.soundtrigger/d' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
 	if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then
-		awk -i inplace '!/DOLBY_/' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
-		#awk -i inplace '!/vendor.audio.dolby/' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
+		sed -i '/DOLBY_/d' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
+		#sed -i '/vendor.audio.dolby/d' hardware/qcom/audio-caf/*/configs/*/*.mk &>/dev/null || true;
 	fi;
 	echo "Deblobbed audio!";
 }
@@ -565,8 +565,8 @@ hardenLocationSerials() {
 
 	#Devices using blob xtra-daemon (which Deblob.sh removes)
 	if [[ "$DOS_VERSION" != "LineageOS-20.0" ]] && [[ "$DOS_VERSION" != "LineageOS-21.0" ]]; then #20.0+ has sysfs_soc_sensitive label
-		find device -name "hal_gnss*.te" -type f -exec sh -c "awk -i inplace '!/sysfs_soc/' {}" \;
-		find device -name "location.te" -type f -exec sh -c "awk -i inplace '!/sysfs_soc/' {}" \;
+	  find device -name "hal_gnss*.te" -type f -exec sh -c "sed -i '/sysfs_soc/d' {}" \;
+	  find device -name "location.te" -type f -exec sh -c "sed -i '/sysfs_soc/d' {}" \;
 	fi;
 
 	#Devices using source built libloc, these ones typically have broad /sys access
@@ -754,8 +754,8 @@ export -f fixupCarrierConfigs;
 
 disableEnforceRRO() {
 	cd "$DOS_BUILD_BASE/$1";
-	awk -i inplace '!/PRODUCT_ENFORCE_RRO_TARGETS .= framework-res/' *.mk &>/dev/null || true;
-	awk -i inplace '!/PRODUCT_ENFORCE_RRO_TARGETS .= \*/' *.mk &>/dev/null || true;
+	sed -i '/PRODUCT_ENFORCE_RRO_TARGETS .= framework-res/d' *.mk &>/dev/null || true;
+	sed -i '/PRODUCT_ENFORCE_RRO_TARGETS .= \*/d' *.mk &>/dev/null || true;
 	sed -i '/PRODUCT_ENFORCE_RRO_TARGETS .= \\/,+1 d' *.mk &>/dev/null || true;
 	echo "Disabled enforced RRO for $1";
 	cd "$DOS_BUILD_BASE";
@@ -765,8 +765,8 @@ export -f disableEnforceRRO;
 disableAPEX() {
 	cd "$DOS_BUILD_BASE/$1";
 	if [[ "$1" != *"device/google/gs101"* ]] && [[ "$1" != *"device/google/gs201"* ]] && [[ "$1" != *"device/google/oriole"* ]] && [[ "$1" != *"device/google/raven"* ]] && [[ "$1" != *"device/google/raviole"* ]] && [[ "$1" != *"device/google/bluejay"* ]] && [[ "$1" != *"device/google/panther"* ]] && [[ "$1" != *"device/google/cheetah"* ]] && [[ "$1" != *"device/google/pantah"* ]] && [[ "$1" != *"device/google/lynx"* ]] && [[ "$1" != *"device/google/tangorpro"* ]] && [[ "$1" != *"device/google/felix"* ]]; then
-		awk -i inplace '!/DEXPREOPT_GENERATE_APEX_IMAGE/' *.mk &>/dev/null || true;
-		awk -i inplace '!/updatable_apex.mk/' *.mk &>/dev/null || true;
+		sed -i '/DEXPREOPT_GENERATE_APEX_IMAGE/d' *.mk &>/dev/null || true;
+		sed -i '/updatable_apex.mk/d' *.mk &>/dev/null || true;
 		echo "Disabled APEX for $1";
 	else
 		echo "Skipped disabling APEX for $1";
