@@ -35,21 +35,21 @@ export -f enableVerity;
 enableAVB() {
 	if [ -d "$DOS_BUILD_BASE/$1" ]; then
 		cd "$DOS_BUILD_BASE/$1";
-		awk -i inplace '!/AVB_MAKE_VBMETA_IMAGE_ARGS \+= --set_hashtree_disabled_flag/' *.mk &>/dev/null || true;
+		sed -i "/AVB_MAKE_VBMETA_IMAGE_ARGS \+= --set_hashtree_disabled_flag/d" *.mk &>/dev/null || true;
 		if [[ "$1" == *"xiaomi"* ]]; then #XXX: broken
 			sed -i 's/AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3/AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 2/' *.mk &>/dev/null || true;
 			echo "Setting PERMISSIVE AVB for $1";
 		else
-			awk -i inplace '!/AVB_MAKE_VBMETA_IMAGE_ARGS \+= --flag/' *.mk &>/dev/null || true;
+			sed -i "/AVB_MAKE_VBMETA_IMAGE_ARGS \+= --flag/d" *.mk &>/dev/null || true;
 			echo "Setting ENFORCING AVB for $1";
 		fi;
 		#Disable chaining
-		awk -i inplace '!/BOARD_AVB_VBMETA_SYSTEM/' *.mk &>/dev/null || true;
-		awk -i inplace '!/BOARD_AVB_VBMETA_VENDOR/' *.mk &>/dev/null || true;
-		awk -i inplace '!/BOARD_AVB_BOOT/' *.mk &>/dev/null || true;
-		#awk -i inplace '!/BOARD_AVB_RECOVERY/' *.mk &>/dev/null || true; #Must be defined for if non-A/B is supported.
-		awk -i inplace '!/vbmeta_system \\/' *.mk &>/dev/null || true;
-		awk -i inplace '!/vbmeta_vendor \\/' *.mk &>/dev/null || true;
+		sed -i "/BOARD_AVB_VBMETA_SYSTEM/d" *.mk &>/dev/null || true;
+		sed -i "/BOARD_AVB_VBMETA_VENDOR/d" *.mk &>/dev/null || true;
+		sed -i "/BOARD_AVB_BOOT/d" *.mk &>/dev/null || true;
+		#sed -i "/BOARD_AVB_RECOVERY/d" *.mk &>/dev/null || true; #Must be defined for if non-A/B is supported.
+		sed -i "/vbmeta_system \\/d" *.mk &>/dev/null || true;
+		sed -i "/vbmeta_vendor \\/d" *.mk &>/dev/null || true;
 		sed -i 's/vbmeta_system//' *.mk &>/dev/null || true;
 		sed -i 's/vbmeta_vendor//' *.mk &>/dev/null || true;
 		sed -i '/\/system /{s|avb=vbmeta_system|avb=vbmeta|}' *fstab* */*fstab* */*/*fstab* &>/dev/null || true;
