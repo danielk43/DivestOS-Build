@@ -65,10 +65,10 @@ index d9858e61f..cd513a47e 100644
              removePreference(Settings.PREF_VOICE_INPUT_KEY);
          }
 diff --git a/java/src/com/android/inputmethod/latin/settings/SettingsValues.java b/java/src/com/android/inputmethod/latin/settings/SettingsValues.java
-index 918978949..4c8618234 100644
+index 6eb8e98b8..8eec5b0f3 100644
 --- a/java/src/com/android/inputmethod/latin/settings/SettingsValues.java
 +++ b/java/src/com/android/inputmethod/latin/settings/SettingsValues.java
-@@ -137,9 +137,7 @@ public class SettingsValues {
+@@ -140,9 +140,7 @@ public class SettingsValues {
          mKeyPreviewPopupOn = Settings.readKeyPreviewPopupEnabled(prefs, res);
          mSlidingKeyInputPreviewEnabled = prefs.getBoolean(
                  DebugSettings.PREF_SLIDING_KEY_INPUT_PREVIEW, true);
@@ -76,10 +76,10 @@ index 918978949..4c8618234 100644
 -                && mInputAttributes.mShouldShowVoiceInputKey
 -                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
 +        mShowsVoiceInputKey = false;
+         mShowNumberRow = prefs.getBoolean(Settings.PREF_SHOW_NUMBER_ROW, false);
+         mShowLongpressHints = prefs.getBoolean(Settings.PREF_SHOW_LONGPRESS_HINTS, true);
          mIncludesOtherImesInLanguageSwitchList = Settings.ENABLE_SHOW_LANGUAGE_SWITCH_KEY_SETTINGS
-                 ? prefs.getBoolean(Settings.PREF_INCLUDE_OTHER_IMES_IN_LANGUAGE_SWITCH_LIST, false)
-                 : true /* forcibly */;
-@@ -368,7 +366,7 @@ public class SettingsValues {
+@@ -374,7 +372,7 @@ public class SettingsValues {
                      .remove(Settings.PREF_VOICE_MODE_OBSOLETE)
                      .apply();
          }
