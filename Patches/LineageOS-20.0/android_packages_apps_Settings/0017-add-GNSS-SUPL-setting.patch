@@ -1,0 +1,368 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date: Fri, 3 Mar 2023 09:53:21 +0200
+Subject: [PATCH] add GNSS SUPL setting
+
+---
+ res/values/strings.xml                        |   8 +-
+ res/xml/location_settings.xml                 |  11 +-
+ .../ext/AbstractListPreferenceController.java | 150 ++++++++++++++++++
+ .../ext/IntSettingPrefController.java         |  70 ++++++++
+ .../ForceDisableSuplPrefController.java       |  45 ------
+ .../location/GnssSuplPrefController.java      |  22 +++
+ 6 files changed, 253 insertions(+), 53 deletions(-)
+ create mode 100644 src/com/android/settings/ext/AbstractListPreferenceController.java
+ create mode 100644 src/com/android/settings/ext/IntSettingPrefController.java
+ delete mode 100644 src/com/android/settings/location/ForceDisableSuplPrefController.java
+ create mode 100644 src/com/android/settings/location/GnssSuplPrefController.java
+
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index 6e619cc2c4..a216f04687 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -14606,6 +14606,10 @@
+     <string name="connectivity_check_title">Internet connectivity check</string>
+     <string name="connectivity_check_summary">HTTP endpoints to use for performing internet connectivity checks.</string>
+ 
+-    <string name="force_disable_supl_title">Force disable Secure User Plane Location (SUPL)</string>
+-    <string name="force_disable_supl_summary">Always disable SUPL assisted location support regardless of carrier configuration or emergency call status (does not disable control plane A-GNSS and DivestOS does not send IMSI to the SUPL)</string>
++    <string name="pref_gnss_supl_title">Secure User Plane Location (SUPL)</string>
++    <string name="pref_gnss_supl_summary">A-GNSS (assisted satellite geolocation) based on nearby cell towers</string>
++
++    <string name="supl_enabled_grapheneos_proxy">Enabled; GrapheneOS proxy</string>
++    <string name="supl_enabled_standard_server">Enabled; standard server</string>
++    <string name="supl_disabled">Disabled</string>
+ </resources>
+diff --git a/res/xml/location_settings.xml b/res/xml/location_settings.xml
+index 82ead9887d..c7015dd255 100644
+--- a/res/xml/location_settings.xml
++++ b/res/xml/location_settings.xml
+@@ -72,12 +72,11 @@
+             android:title="@string/location_services_preference_title"
+             settings:controller="com.android.settings.location.LocationServicesPreferenceController"/>
+ 
+-
+-        <com.android.settingslib.RestrictedSwitchPreference
+-            android:key="force_disable_supl"
+-            android:title="@string/force_disable_supl_title"
+-            android:summary="@string/force_disable_supl_summary"
+-            settings:controller="com.android.settings.location.ForceDisableSuplPrefController"/>
++        <ListPreference
++            android:key="gnss_supl"
++            android:title="@string/pref_gnss_supl_title"
++            android:summary="@string/pref_gnss_supl_summary"
++            settings:controller="com.android.settings.location.GnssSuplPrefController"/>
+ 
+     </PreferenceCategory>
+ 
+diff --git a/src/com/android/settings/ext/AbstractListPreferenceController.java b/src/com/android/settings/ext/AbstractListPreferenceController.java
+new file mode 100644
+index 0000000000..f4179c49cb
+--- /dev/null
++++ b/src/com/android/settings/ext/AbstractListPreferenceController.java
+@@ -0,0 +1,150 @@
++/*
++ * Copyright (C) 2022 GrapheneOS
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++package com.android.settings.ext;
++
++import android.content.Context;
++import android.text.format.DateUtils;
++import android.util.SparseIntArray;
++
++import androidx.annotation.StringRes;
++import androidx.preference.ListPreference;
++import androidx.preference.Preference;
++import androidx.preference.PreferenceScreen;
++
++import com.android.settings.core.BasePreferenceController;
++
++import java.util.ArrayList;
++import java.util.concurrent.TimeUnit;
++
++public abstract class AbstractListPreferenceController extends BasePreferenceController
++    implements Preference.OnPreferenceChangeListener {
++
++    private ListPreference preference;
++    private Entries entries;
++    // current preference value is prepended to the baseSummary
++    private CharSequence baseSummary;
++
++    protected AbstractListPreferenceController(Context ctx, String key) {
++        super(ctx, key);
++    }
++
++    // call entries.add(entryName, entryValue) to add entries.
++    // entryValues can be mapped from other values or sets of values, as long as getCurrentValue()
++    // and setValue() methods are consistent
++    protected abstract void getEntries(Entries entries);
++
++    protected abstract int getCurrentValue();
++    protected abstract boolean setValue(int val);
++
++    @Override
++    public void displayPreference(PreferenceScreen screen) {
++        super.displayPreference(screen);
++
++        ListPreference p = screen.findPreference(mPreferenceKey);
++        if (p == null) {
++            return;
++        }
++
++        this.preference = p;
++
++        if (p.getEntries() == null) {
++            if (entries == null) {
++                entries = new Entries(mContext);
++                getEntries(entries);
++            }
++
++            baseSummary = p.getSummary();
++
++            p.setSingleLineTitle(false);
++            p.setEntries(entries.getTitles());
++            p.setEntryValues(entries.getValues());
++            p.setPersistent(false);
++            p.setOnPreferenceChangeListener(this);
++        }
++
++        updatePreference();
++    }
++
++    void updatePreference() {
++        ListPreference p = preference;
++        if (p == null) {
++            return;
++        }
++
++        int idx = entries.getIndexForValue(getCurrentValue());
++        if (idx >= 0) {
++            p.setValueIndex(idx);
++
++            var summary = new StringBuilder();
++            summary.append("[ ");
++            summary.append(p.getEntries()[idx]);
++            summary.append(" ]");
++            if (baseSummary != null) {
++                summary.append("\n\n");
++                summary.append(baseSummary);
++            }
++            p.setSummary(summary.toString());
++        }
++    }
++
++    @Override
++    public boolean onPreferenceChange(Preference preference, Object o) {
++        int val = Integer.parseInt((String) o);
++        return setValue(val);
++    }
++
++    public static class Entries {
++        private final Context context;
++        private final ArrayList<CharSequence> titles = new ArrayList<>();
++        private final ArrayList<String> values = new ArrayList<>();
++        private final SparseIntArray valueToIndexMap = new SparseIntArray();
++
++        Entries(Context context) {
++            this.context = context;
++        }
++
++        public void add(@StringRes int title, int value) {
++            add(context.getText(title), value);
++        }
++
++        public void add(int duration, TimeUnit timeUnit) {
++            long durationMillis = timeUnit.toMillis(duration);
++            if (durationMillis > Integer.MAX_VALUE) {
++                throw new IllegalArgumentException();
++            }
++
++            add(DateUtils.formatDuration(durationMillis), (int) durationMillis);
++        }
++
++        public void add(CharSequence title, int value) {
++            titles.add(title);
++            values.add(Integer.toString(value));
++            valueToIndexMap.put(value, values.size() - 1);
++        }
++
++        public CharSequence[] getTitles() {
++            return titles.toArray(CharSequence[]::new);
++        }
++
++        public String[] getValues() {
++            return values.toArray(String[]::new);
++        }
++
++        public int getIndexForValue(int val) {
++            return valueToIndexMap.get(val, -1);
++        }
++    }
++
++    @Override
++    public boolean isSliceable() {
++        return false;
++    }
++
++    @Override
++    public int getSliceHighlightMenuRes() {
++        return NO_RES;
++    }
++}
+diff --git a/src/com/android/settings/ext/IntSettingPrefController.java b/src/com/android/settings/ext/IntSettingPrefController.java
+new file mode 100644
+index 0000000000..fb7574fa4e
+--- /dev/null
++++ b/src/com/android/settings/ext/IntSettingPrefController.java
+@@ -0,0 +1,70 @@
++/*
++ * Copyright (C) 2022 GrapheneOS
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++package com.android.settings.ext;
++
++import android.content.Context;
++import android.ext.settings.IntSetting;
++import android.ext.settings.Setting;
++import android.os.Process;
++
++import androidx.annotation.NonNull;
++import androidx.lifecycle.DefaultLifecycleObserver;
++import androidx.lifecycle.LifecycleOwner;
++
++import java.util.function.Consumer;
++
++public abstract class IntSettingPrefController extends AbstractListPreferenceController
++        implements DefaultLifecycleObserver, Consumer<IntSetting>
++{
++    private final IntSetting setting;
++
++    protected IntSettingPrefController(Context ctx, String key, IntSetting setting) {
++        super(ctx, key);
++        this.setting = setting;
++    }
++
++    @Override
++    public int getAvailabilityStatus() {
++        if (setting.getScope() == Setting.Scope.GLOBAL) {
++            if (!Process.myUserHandle().isSystem()) {
++                return DISABLED_FOR_USER;
++            }
++        }
++        return AVAILABLE;
++    }
++
++    @Override
++    protected final int getCurrentValue() {
++        return setting.get(mContext);
++    }
++
++    @Override
++    protected final boolean setValue(int val) {
++        return setting.put(mContext, val);
++    }
++
++    private Object observer;
++
++    @Override
++    public void onResume(@NonNull LifecycleOwner owner) {
++        if (setting.canObserveState()) {
++            observer = setting.registerObserver(mContext, this, mContext.getMainThreadHandler());
++        }
++    }
++
++    // called by the setting observer
++    @Override
++    public void accept(IntSetting intSetting) {
++        updatePreference();
++    }
++
++    @Override
++    public void onPause(@NonNull LifecycleOwner owner) {
++        if (setting.canObserveState()) {
++            setting.unregisterObserver(mContext, observer);
++        }
++    }
++}
+diff --git a/src/com/android/settings/location/ForceDisableSuplPrefController.java b/src/com/android/settings/location/ForceDisableSuplPrefController.java
+deleted file mode 100644
+index 3a44261cc5..0000000000
+--- a/src/com/android/settings/location/ForceDisableSuplPrefController.java
++++ /dev/null
+@@ -1,45 +0,0 @@
+-package com.android.settings.location;
+-
+-import android.content.Context;
+-import android.os.Process;
+-import android.provider.Settings;
+-
+-import com.android.settings.core.TogglePreferenceController;
+-
+-public class ForceDisableSuplPrefController extends TogglePreferenceController {
+-
+-    public ForceDisableSuplPrefController(Context ctx, String key) {
+-        super(ctx, key);
+-    }
+-
+-    @Override
+-    public int getAvailabilityStatus() {
+-        if (!Process.myUserHandle().isSystem()) {
+-            return DISABLED_FOR_USER;
+-        }
+-
+-        return AVAILABLE;
+-    }
+-
+-    @Override
+-    public boolean isChecked() {
+-        var cr = mContext.getContentResolver();
+-        String key = Settings.Global.FORCE_DISABLE_SUPL;
+-        int def = Settings.Global.FORCE_DISABLE_SUPL_DEFAULT;
+-
+-        return Settings.Global.getInt(cr, key, def) == 1;
+-    }
+-
+-    @Override
+-    public boolean setChecked(boolean isChecked) {
+-        var cr = mContext.getContentResolver();
+-        String key = Settings.Global.FORCE_DISABLE_SUPL;
+-
+-        return Settings.Global.putInt(cr, key, isChecked ? 1 : 0);
+-    }
+-
+-    @Override
+-    public int getSliceHighlightMenuRes() {
+-        return NO_RES;
+-    }
+-}
+diff --git a/src/com/android/settings/location/GnssSuplPrefController.java b/src/com/android/settings/location/GnssSuplPrefController.java
+new file mode 100644
+index 0000000000..65625b3bf2
+--- /dev/null
++++ b/src/com/android/settings/location/GnssSuplPrefController.java
+@@ -0,0 +1,22 @@
++package com.android.settings.location;
++
++import android.content.Context;
++import android.ext.settings.ExtSettings;
++import android.ext.settings.GnssConstants;
++
++import com.android.settings.R;
++import com.android.settings.ext.IntSettingPrefController;
++
++public class GnssSuplPrefController extends IntSettingPrefController {
++
++    public GnssSuplPrefController(Context ctx, String key) {
++        super(ctx, key, ExtSettings.GNSS_SUPL);
++    }
++
++    @Override
++    protected void getEntries(Entries entries) {
++        entries.add(R.string.supl_enabled_grapheneos_proxy, GnssConstants.SUPL_SERVER_GRAPHENEOS_PROXY);
++        entries.add(R.string.supl_enabled_standard_server, GnssConstants.SUPL_SERVER_STANDARD);
++        entries.add(R.string.supl_disabled, GnssConstants.SUPL_DISABLED);
++    }
++}
