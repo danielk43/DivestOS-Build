@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Tue, 14 Feb 2023 17:57:51 -0500
+Subject: [PATCH] redbull: Add custom avb key
+
+Change-Id: Ifc438d22452fdc0adec5ce82b9368581675a11a4
+---
+ BoardConfig-common.mk | 4 ++--
+ BoardConfigLineage.mk | 4 +++-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/BoardConfig-common.mk b/BoardConfig-common.mk
+index 9bcb8fc5..83669c9f 100644
+--- a/BoardConfig-common.mk
++++ b/BoardConfig-common.mk
+@@ -108,8 +108,8 @@ TARGET_RECOVERY_UI_LIB := \
+ 
+ # Enable chain partition for system.
+ BOARD_AVB_VBMETA_SYSTEM := system system_ext product
+-BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
+-BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
++BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA4096
+ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
+ 
+diff --git a/BoardConfigLineage.mk b/BoardConfigLineage.mk
+index 237c62e4..c5b57ddc 100644
+--- a/BoardConfigLineage.mk
++++ b/BoardConfigLineage.mk
+@@ -56,4 +56,6 @@ BOARD_SEPOLICY_DIRS += device/google/redbull/sepolicy-lineage/dynamic
+ BOARD_SEPOLICY_DIRS += device/google/redbull/sepolicy-lineage/vendor
+ 
+ # Verified Boot
+-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
++#BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
++BOARD_AVB_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_ALGORITHM := SHA256_RSA4096
