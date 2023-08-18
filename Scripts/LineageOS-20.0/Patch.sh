@@ -97,6 +97,8 @@ applyPatch "$DOS_PATCHES/android_build/0004-Selective_APEX.patch"; #Only enable 
 sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aapt2.mk; #Enable auto-add-overlay for packages, this allows the vendor overlay to easily work across all branches.
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_util.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 sed -i "/Camera2/d" target/product/handheld_product.mk;
+sed -i "/android.hardware.biometrics.fingerprint/d" target/product/generic_system.mk;
+[[ -n ${AVB} ]] && applyPatch "$DOS_PATCHES/android_build/0002-Patch-makefile-for-custom-avb.patch"; #Add support for custom AVB key
 fi;
 
 if enterAndClear "build/soong"; then
@@ -213,6 +215,7 @@ sed -i 's/MAX_PASSWORD_LENGTH = 16/MAX_PASSWORD_LENGTH = 64/' core/java/android/
 sed -i 's/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 72 \* 60 \* 60 \* 1000;/DEFAULT_STRONG_AUTH_TIMEOUT_MS = 12 * 60 * 60 * 1000;/' core/java/android/app/admin/DevicePolicyManager.java; #Decrease the strong auth prompt timeout to occur more often
 #rm -rf packages/CompanionDeviceManager; #Used to support Android Wear (which hard depends on GMS)
 rm -rf packages/PrintRecommendationService; #Creates popups to install proprietary print apps
+sed -i 's/time.android.com/us.pool.ntp.org/' core/res/res/values/config.xml; #Use non-Android ntp pool
 fi;
 
 if enterAndClear "frameworks/ex"; then
@@ -464,7 +467,7 @@ sed -i '/config_multiuserMaximumUsers/d' overlay/common/frameworks/base/core/res
 sed -i '/config_locationExtraPackageNames/,+11d' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
 sed -i '/def_backup_transport/d' overlay/common/frameworks/base/packages/SettingsProvider/res/values/defaults.xml; #Unset default backup provider
 if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUDIOFX/,+3d' config/common_full.mk; fi; #Remove AudioFX
-sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
+#sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
 #echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our customizations
 #cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
 cp -f "$DOS_PATCHES_COMMON/sensitive_pn.xml" prebuilt/common/etc/sensitive_pn.xml; #Update helplines
@@ -475,6 +478,11 @@ sed -i '/com.android.vending/d' overlay/common/frameworks/base/core/res/res/valu
 sed -i '/com.google.android/d' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
 sed -i "s/Aperture/SecureCamera/" config/common_full.mk;
 sed -i "s/org.lineageos.aperture/app.grapheneos.camera/" overlay/common/frameworks/base/core/res/res/values/config.xml;
+sed -i "/Filter out random types/,/endif/d" config/version.mk; #Allow custom build types
+sed -i "s/Jelly/Chromium/" config/common_mobile.mk; #Replace Jelly with Cromite browser
+[[ ! "${WITH_GMS}" = true ]] && printf "\n\nPRODUCT_PACKAGES += Obtainium PdfViewer" | tee -a config/common_mobile.mk; #Add additional apks from android_vendor_partner_gms
+curl https://raw.githubusercontent.com/GrapheneOS/platform_packages_apps_Dialer/13/java/com/android/voicemail/impl/res/xml/vvm_config.xml -o overlay/common/packages/apps/Dialer/java/com/android/voicemail/impl/res/xml/vvm_config.xml; #Use GrapheneOS visual voicemail config
+applyPatch "$DOS_PATCHES/android_vendor_lineage/0002-Update-webview-providers.patch"; #Allowlist Mulch webview
 fi;
 
 # if enter "vendor/divested"; then
@@ -508,6 +516,17 @@ if enterAndClear "device/fxtec/pro1"; then
 echo "type qti_debugfs, fs_type, debugfs_type;" >> sepolicy/vendor/file.te; #fixup
 fi;
 
+for codename in barbet bramble coral crosshatch gs201 pantah redbull redfin
+do
+  if enterAndClear "device/google/$codename"; then
+    (sed -i "/PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS/d" aosp_$codename.mk aosp_common.mk; git commit -am "Disable mainline checking") || true
+    for patch in "$DOS_PATCHES"/android_device_google_"$codename"/*.patch
+    do
+      applyPatch "$patch"
+    done
+  fi
+done;
+
 if enterAndClear "device/google/gs101"; then
 # git revert --no-edit 371473c97a3769f9b0629b33ae7014e78e1e31bb; #potential breakage;
 if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then sed -i '/google iwlan/,+8d' device.mk; fi; #fix stray
@@ -516,7 +535,7 @@ fi;
 if enterAndClear "device/google/gs201"; then
 if [ "$DOS_DEBLOBBER_REMOVE_CNE" = true ]; then sed -i '/google iwlan/,+8d' device.mk; fi; #fix stray
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC" = true ]; then sed -i '/eSIM MEP/,+4d' device.mk; fi; #fix stray
-sed -i "/PRODUCT_PACKAGES/d" widevine/device.mk;
+  sed -i "/PRODUCT_PACKAGES/d" widevine/device.mk || true;
 fi;
 
 if enterAndClear "device/google/redbull"; then
@@ -567,6 +586,29 @@ fi;
 if enterAndClear "kernel/fairphone/sdm632"; then
 sed -i 's|/../../prebuilts/tools-lineage|/../../../prebuilts/tools-lineage|' lib/Makefile; #fixup typo
 fi;
+
+#Patch pixel kernels here for now
+for kernel in "msm-4.9" "msm-4.14" "redbull" "gs201_private_gs-google"
+do
+  kernel_dir=$(printf $kernel | sed "s#_#/#g")
+  if enterAndClear "kernel/google/$kernel_dir"; then
+    "${GIT_LOCAL}"/DivestOS-Build/Scripts/"${BUILD_WORKING_DIR}"/CVE_Patchers/android_kernel_google_$kernel.sh
+  fi
+done;
+
+cd "$DOS_BUILD_BASE"
+#Apply gesture input lib here for now
+for codename in barbet blueline bramble coral crosshatch flame panther redfin
+do
+  if [[ -d vendor/google/"$codename" ]]; then
+    [[ ! -f libjni_latinimegoogle.so ]] && curl -LO https://gitlab.com/MindTheGapps/vendor_gapps/-/raw/tau/arm64/proprietary/product/lib64/libjni_latinimegoogle.so
+    cd vendor/google/"$codename"
+    mkdir -p proprietary/product/lib64 || true
+    cp "$DOS_BUILD_BASE"/libjni_latinimegoogle.so proprietary/product/lib64
+    printf "\nPRODUCT_COPY_FILES += vendor/google/$codename/proprietary/product/lib64/libjni_latinimegoogle.so:\$(TARGET_COPY_OUT_PRODUCT)/lib64/libjni_latinimegoogle.so\n" | tee -a $codename-vendor.mk; #Add gesture input to AOSP keyboard
+    cd "$DOS_BUILD_BASE"
+  fi
+done;
 
 #Make changes to all devices
 cd "$DOS_BUILD_BASE";

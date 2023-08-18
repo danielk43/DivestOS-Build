@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Wed, 25 Oct 2023 20:25:16 -0400
+Subject: [PATCH] pantah: Remove modules
+
+Change-Id: I0b97c5db2d6f6758ec83daa5d92843392b41de1c
+---
+ device-lineage.mk   | 11 -----------
+ device-panther.mk   |  6 +-----
+ panther/vendor.prop |  8 ++++----
+ 3 files changed, 5 insertions(+), 20 deletions(-)
+
+diff --git a/device-lineage.mk b/device-lineage.mk
+index 82b7379..80769f4 100644
+--- a/device-lineage.mk
++++ b/device-lineage.mk
+@@ -7,13 +7,6 @@
+ # Overlays
+ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
+ 
+-# EUICC
+-PRODUCT_COPY_FILES += \
+-    frameworks/native/data/etc/android.hardware.telephony.euicc.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.telephony.euicc.xml
+-
+-PRODUCT_PACKAGES += \
+-    EuiccSupportPixelOverlay
+-
+ # PowerShare
+ include hardware/google/pixel/powershare/device.mk
+ 
+@@ -117,10 +110,6 @@ PRODUCT_PACKAGES += \
+ PRODUCT_PACKAGES += \
+     android.frameworks.stats-V1-ndk.vendor:32 \
+     android.hardware.authsecret@1.0.vendor:64 \
+-    android.hardware.biometrics.common-V2-ndk.vendor:64 \
+-    android.hardware.biometrics.face-V2-ndk.vendor:64 \
+-    android.hardware.biometrics.face@1.0.vendor:64 \
+-    android.hardware.biometrics.fingerprint-V2-ndk.vendor:64 \
+     android.hardware.input.common-V1-ndk.vendor:64 \
+     android.hardware.input.processor-V1-ndk.vendor:64 \
+     android.hardware.keymaster@3.0.vendor:64 \
+diff --git a/device-panther.mk b/device-panther.mk
+index 9aaf107..b07a9bc 100644
+--- a/device-panther.mk
++++ b/device-panther.mk
+@@ -343,7 +343,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
+ # The default value of this variable is false and should only be set to true when
+ # the device allows users to enable the seamless transfer feature.
+ PRODUCT_PRODUCT_PROPERTIES += \
+-   euicc.seamless_transfer_enabled_in_non_qs=true
++   euicc.seamless_transfer_enabled_in_non_qs=false
+ 
+ # Device features
+ PRODUCT_COPY_FILES += \
+@@ -352,7 +352,3 @@ PRODUCT_COPY_FILES += \
+ # Enable adpf cpu hint session for SurfaceFlinger
+ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+     debug.sf.enable_adpf_cpu_hint=true
+-
+-# HBM
+-PRODUCT_PACKAGES += \
+-    HbmSVManagerOverlayPanther
+diff --git a/panther/vendor.prop b/panther/vendor.prop
+index cf31235..e7575fe 100644
+--- a/panther/vendor.prop
++++ b/panther/vendor.prop
+@@ -1,10 +1,10 @@
+ # DRM
+-drm.service.enabled=true
+-media.mediadrmservice.enable=true
++drm.service.enabled=false
++media.mediadrmservice.enable=false
+ 
+ # Radio
+-persist.vendor.ril.ecc.xml=1
+-persist.vendor.ril.support_nr_ds=1
++persist.vendor.ril.ecc.xml=0
++persist.vendor.ril.support_nr_ds=0
+ persist.vendor.ril.use_radio_hal=2.0
+ ro.vendor.config.build_carrier=europen
+ vendor.rild.libpath=libsitril.so
