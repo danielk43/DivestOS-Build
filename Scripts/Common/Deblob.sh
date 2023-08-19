@@ -926,17 +926,4 @@ rm -rf packages/apps/ImsServiceEntitlement/* || true;
 
 cd "$DOS_BUILD_BASE";
 
-#Apply gesture input lib here for now
-for codename in barbet blueline bramble coral crosshatch flame redfin
-do
-  if [[ -d vendor/google/"$codename" ]]; then
-    [[ ! -f libjni_latinimegoogle.so ]] && curl -LO https://gitlab.com/MindTheGapps/vendor_gapps/-/raw/tau/arm64/proprietary/product/lib64/libjni_latinimegoogle.so
-    cd vendor/google/"$codename"
-    mkdir -p proprietary/product/lib64 || true
-    cp "$DOS_BUILD_BASE"/libjni_latinimegoogle.so proprietary/product/lib64
-    printf "\nPRODUCT_COPY_FILES += vendor/google/$codename/proprietary/product/lib64/libjni_latinimegoogle.so:\$(TARGET_COPY_OUT_PRODUCT)/lib64/libjni_latinimegoogle.so\n" | tee -a $codename-vendor.mk; #Add gesture input to AOSP keyboard
-    cd "$DOS_BUILD_BASE"
-  fi
-done;
-
 echo -e "\e[0;32m[SCRIPT COMPLETE] Deblobbing complete\e[0m";
