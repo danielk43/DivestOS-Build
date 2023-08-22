@@ -808,9 +808,9 @@ deblobDevice() {
 	  sed -i "/$blob/d" ./*proprietary*.txt &>/dev/null || true; #Remove all blob references from blob manifest
 	  sed -i "/$blob/d" ./*/*proprietary*.txt &>/dev/null || true; #Remove all blob references from blob manifest location in subdirectory
   done
-	if [ -f setup-makefiles.sh ]; then
-		bash -c "cd $DOS_BUILD_BASE/$devicePath && ./setup-makefiles.sh" || true; #Update the makefiles
-	fi;
+	#if [ -f setup-makefiles.sh ]; then
+	#	 bash -c "cd $DOS_BUILD_BASE/$devicePath && ./setup-makefiles.sh" || true; #Update the makefiles
+	#fi;
 	cd "$DOS_BUILD_BASE";
 }
 export -f deblobDevice;
