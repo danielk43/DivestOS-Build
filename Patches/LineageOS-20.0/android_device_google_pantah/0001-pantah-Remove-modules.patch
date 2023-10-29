@@ -1,14 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: danielk43 <11856117+danielk43@users.noreply.github.com>
-Date: Wed, 25 Oct 2023 20:25:16 -0400
+Date: Sat, 28 Oct 2023 14:11:09 -0400
 Subject: [PATCH] pantah: Remove modules
 
-Change-Id: I0b97c5db2d6f6758ec83daa5d92843392b41de1c
+Change-Id: Ie3981ca10d96d2de7bdc016df87407d609fbf1ea
 ---
  device-lineage.mk   | 11 -----------
- device-panther.mk   |  6 +-----
  panther/vendor.prop |  8 ++++----
- 3 files changed, 5 insertions(+), 20 deletions(-)
+ 2 files changed, 4 insertions(+), 15 deletions(-)
 
 diff --git a/device-lineage.mk b/device-lineage.mk
 index 82b7379..80769f4 100644
@@ -39,27 +38,6 @@ index 82b7379..80769f4 100644
      android.hardware.input.common-V1-ndk.vendor:64 \
      android.hardware.input.processor-V1-ndk.vendor:64 \
      android.hardware.keymaster@3.0.vendor:64 \
-diff --git a/device-panther.mk b/device-panther.mk
-index 9aaf107..b07a9bc 100644
---- a/device-panther.mk
-+++ b/device-panther.mk
-@@ -343,7 +343,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
- # The default value of this variable is false and should only be set to true when
- # the device allows users to enable the seamless transfer feature.
- PRODUCT_PRODUCT_PROPERTIES += \
--   euicc.seamless_transfer_enabled_in_non_qs=true
-+   euicc.seamless_transfer_enabled_in_non_qs=false
- 
- # Device features
- PRODUCT_COPY_FILES += \
-@@ -352,7 +352,3 @@ PRODUCT_COPY_FILES += \
- # Enable adpf cpu hint session for SurfaceFlinger
- PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-     debug.sf.enable_adpf_cpu_hint=true
--
--# HBM
--PRODUCT_PACKAGES += \
--    HbmSVManagerOverlayPanther
 diff --git a/panther/vendor.prop b/panther/vendor.prop
 index cf31235..e7575fe 100644
 --- a/panther/vendor.prop
