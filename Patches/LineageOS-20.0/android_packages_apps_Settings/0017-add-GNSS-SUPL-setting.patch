@@ -4,28 +4,26 @@ Date: Fri, 3 Mar 2023 09:53:21 +0200
 Subject: [PATCH] add GNSS SUPL setting
 
 ---
- res/values/strings.xml                        |   8 +-
+ res/values/strings.xml                        |   6 +
  res/xml/location_settings.xml                 |  11 +-
  .../ext/AbstractListPreferenceController.java | 150 ++++++++++++++++++
  .../ext/IntSettingPrefController.java         |  70 ++++++++
  .../ForceDisableSuplPrefController.java       |  45 ------
  .../location/GnssSuplPrefController.java      |  22 +++
- 6 files changed, 253 insertions(+), 53 deletions(-)
+ 6 files changed, 253 insertions(+), 51 deletions(-)
  create mode 100644 src/com/android/settings/ext/AbstractListPreferenceController.java
  create mode 100644 src/com/android/settings/ext/IntSettingPrefController.java
  delete mode 100644 src/com/android/settings/location/ForceDisableSuplPrefController.java
  create mode 100644 src/com/android/settings/location/GnssSuplPrefController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 6e619cc2c4..a216f04687 100644
+index a71167e281..5ded41e82a 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -14606,6 +14606,10 @@
-     <string name="connectivity_check_title">Internet connectivity check</string>
-     <string name="connectivity_check_summary">HTTP endpoints to use for performing internet connectivity checks.</string>
- 
--    <string name="force_disable_supl_title">Force disable Secure User Plane Location (SUPL)</string>
--    <string name="force_disable_supl_summary">Always disable SUPL assisted location support regardless of carrier configuration or emergency call status (does not disable control plane A-GNSS and DivestOS does not send IMSI to the SUPL)</string>
+@@ -14610,4 +14610,10 @@
+     <string name="force_disable_supl_summary">Always disable SUPL assisted location support regardless of carrier configuration or emergency call status (does not disable control plane A-GNSS and DivestOS does not send IMSI to the SUPL)</string>
+     <string name="openeuicc_title">Enable eUICC management</string>
+     <string name="openeuicc_summary">Enables the OpenEUICC app to allow management of virtual (eSIM) and physical eUICC cards. Reboot required after toggling.</string>
 +    <string name="pref_gnss_supl_title">Secure User Plane Location (SUPL)</string>
 +    <string name="pref_gnss_supl_summary">A-GNSS (assisted satellite geolocation) based on nearby cell towers</string>
 +
