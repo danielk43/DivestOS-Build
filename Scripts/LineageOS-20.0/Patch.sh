@@ -482,7 +482,7 @@ sed -i "/Filter out random types/,/endif/d" config/version.mk; #Allow custom bui
 sed -i "s/Jelly/Chromium/" config/common_mobile.mk; #Replace Jelly with Cromite browser
 [[ ! "${WITH_GMS}" = true ]] && printf "\n\nPRODUCT_PACKAGES += Obtainium PdfViewer" | tee -a config/common_mobile.mk; #Add additional apks from android_vendor_partner_gms
 curl https://raw.githubusercontent.com/GrapheneOS/platform_packages_apps_Dialer/13/java/com/android/voicemail/impl/res/xml/vvm_config.xml -o overlay/common/packages/apps/Dialer/java/com/android/voicemail/impl/res/xml/vvm_config.xml; #Use GrapheneOS visual voicemail config
-applyPatch "$DOS_PATCHES/android_vendor_lineage/0002-Update-webview-providers.patch"; #Allowlist Mulch webview
+applyPatch "$DOS_PATCHES/android_vendor_lineage/0001-Update-webview-providers.patch"; #Allowlist webviews
 fi;
 
 # if enter "vendor/divested"; then
