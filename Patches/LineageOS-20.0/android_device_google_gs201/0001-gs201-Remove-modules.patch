@@ -53,12 +53,12 @@ index 2d02158..86ee3fe 100644
  CHEETAH_PRODUCT := %cheetah
  LYNX_PRODUCT := %lynx
 diff --git a/lineage_common.mk b/lineage_common.mk
-index d7ba4f5..5515c46 100644
+index 431977d..db36932 100644
 --- a/lineage_common.mk
 +++ b/lineage_common.mk
-@@ -16,15 +16,8 @@ PRODUCT_PRODUCT_PROPERTIES += \
-     ro.vendor.camera.extensions.package=com.google.android.apps.camera.services \
-     ro.vendor.camera.extensions.service=com.google.android.apps.camera.services.extensions.service.PixelExtensions
+@@ -21,15 +21,8 @@ ifeq ($(WITH_GMS),true)
+ GMS_MAKEFILE=gms_64bit_only.mk
+ endif
  
 -# Google Assistant
 -PRODUCT_PRODUCT_PROPERTIES += ro.opa.eligible_device=true
