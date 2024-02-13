@@ -327,7 +327,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0015-SUPL_Toggle.patch";
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0016-microG_Toggle.patch"; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-OpenEUICC_Toggle.patch"; fi; #Add a toggle for OpenEUICC enablement (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
@@ -450,8 +450,8 @@ sed -i '/com.google.android/d' overlay/common/frameworks/base/core/res/res/value
 sed -i "s/Aperture/SecureCamera/" config/common_full.mk;
 sed -i "s/org.lineageos.aperture/app.grapheneos.camera/" overlay/common/frameworks/base/core/res/res/values/config.xml;
 sed -i "/Filter out random types/,/endif/d" config/version.mk; #Allow custom build types
-sed -i "s/Jelly/TrichromeChrome TrichromeLibrary TrichromeWebView/" config/common_mobile.mk; #Replace Jelly with Cromite browser
-[[ ! "${WITH_GMS}" = true ]] && printf "\n\nPRODUCT_PACKAGES += Obtainium PdfViewer" | tee -a config/common_mobile.mk; #Add additional apks from android_vendor_partner_gms
+sed -i "s/Jelly/ChromePublic SystemWebview TrichromeChrome TrichromeLibrary TrichromeWebView/" config/common_mobile.mk; #Replace Jelly with Cromite browser
+[[ ! "${WITH_GMS}" = true ]] && printf "\n\nPRODUCT_PACKAGES += AuroraStore Obtainium PdfViewer" | tee -a config/common_mobile.mk; #Add additional apks from android_vendor_partner_gms
 applyPatch "$DOS_PATCHES/android_vendor_lineage/0001-Update-webview-providers.patch"; #Allowlist webviews
 fi;
 
@@ -479,7 +479,7 @@ if enterAndClear "device/fxtec/pro1"; then
 echo "type qti_debugfs, fs_type, debugfs_type;" >> sepolicy/vendor/file.te; #fixup
 fi;
 
-for codename in barbet bramble coral crosshatch gs101 gs201 pantah raviole redbull redfin
+for codename in barbet bramble coral crosshatch gs101 gs201 lynx pantah raviole redbull redfin
 do
   if enterAndClear "device/google/$codename"; then
     (sed -i "/PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS/d" aosp_$codename.mk aosp_common.mk; git commit -am "Disable mainline checking") || true
@@ -502,7 +502,7 @@ if [ "$DOS_DEBLOBBER_REMOVE_EUICC" = true ]; then sed -i '/eSIM MEP/,+4d' device
 fi;
 
 if enterAndClear "device/google/redbull"; then
-sed -i '/sctp/d' BoardConfig-common.mk modules.load; #fix compile after hardenDefconfig
+sed -i "/sctp/d" BoardConfig-common.mk modules.load; #fix compile after hardenDefconfig
 fi;
 
 if enterAndClear "device/google/muskie"; then
@@ -561,7 +561,7 @@ done;
 
 cd "$DOS_BUILD_BASE"
 #Apply gesture input lib here for now
-for codename in barbet blueline bramble coral crosshatch flame panther raven redfin
+for codename in barbet blueline bramble coral crosshatch flame lynx panther raven redfin
 do
   if [[ -d vendor/google/"$codename" ]]; then
     [[ ! -f libjni_latinimegoogle.so ]] && curl -LO https://gitlab.com/MindTheGapps/vendor_gapps/-/raw/tau/arm64/proprietary/product/lib64/libjni_latinimegoogle.so
