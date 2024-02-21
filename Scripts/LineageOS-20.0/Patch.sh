@@ -327,7 +327,7 @@ applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0015-SUPL_Toggle.patch";
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0016-microG_Toggle.patch"; #Add a toggle for microG enablement (heavily based off of a GrapheneOS patch)
 if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-OpenEUICC_Toggle.patch"; fi; #Add a toggle for OpenEUICC enablement (heavily based off of a GrapheneOS patch)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
