@@ -17,10 +17,10 @@ Subject: [PATCH] add GNSS SUPL setting
  create mode 100644 src/com/android/settings/location/GnssSuplPrefController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index a71167e281..5ded41e82a 100644
+index b2fd31dbc3..1c0e96055c 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -14610,4 +14610,10 @@
+@@ -14613,4 +14613,10 @@
      <string name="force_disable_supl_summary">Always disable SUPL assisted location support regardless of carrier configuration or emergency call status (does not disable control plane A-GNSS and DivestOS does not send IMSI to the SUPL)</string>
      <string name="openeuicc_title">Enable eUICC management</string>
      <string name="openeuicc_summary">Enables the OpenEUICC app to allow management of virtual (eSIM) and physical eUICC cards. Reboot required after toggling.</string>
