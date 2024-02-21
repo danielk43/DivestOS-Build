@@ -346,7 +346,7 @@ if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$D
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels.patch"; #Smart Pixels (CarbonROM/various)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels-a1.patch"; #Fix long click intent for Smart Pixels tile (crDroid/various)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0017-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
