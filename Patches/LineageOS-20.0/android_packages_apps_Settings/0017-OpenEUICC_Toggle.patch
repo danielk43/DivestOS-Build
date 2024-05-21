@@ -16,10 +16,10 @@ Signed-off-by: Tad <tad@spotco.us>
  create mode 100644 src/com/android/settings/security/OpenEuiccPreferenceController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 6e619cc2c4..a71167e281 100644
+index ce056d7ab0..b2fd31dbc3 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -14608,4 +14608,6 @@
+@@ -14611,4 +14611,6 @@
  
      <string name="force_disable_supl_title">Force disable Secure User Plane Location (SUPL)</string>
      <string name="force_disable_supl_summary">Always disable SUPL assisted location support regardless of carrier configuration or emergency call status (does not disable control plane A-GNSS and DivestOS does not send IMSI to the SUPL)</string>
@@ -27,12 +27,12 @@ index 6e619cc2c4..a71167e281 100644
 +    <string name="openeuicc_summary">Enables the OpenEUICC app to allow management of virtual (eSIM) and physical eUICC cards. Reboot required after toggling.</string>
  </resources>
 diff --git a/res/xml/security_dashboard_settings.xml b/res/xml/security_dashboard_settings.xml
-index db158b7243..738394cdd7 100644
+index 604e8720e6..de90cec5bc 100644
 --- a/res/xml/security_dashboard_settings.xml
 +++ b/res/xml/security_dashboard_settings.xml
-@@ -86,6 +86,12 @@
-             android:title="@string/hosts_disable_title"
-             android:summary="@string/hosts_disable_summary"
+@@ -92,6 +92,12 @@
+             android:title="@string/sig_spoof_title"
+             android:summary="@string/sig_spoof_summary"
              android:persistent="false" />
 +
 +        <SwitchPreference
@@ -156,13 +156,13 @@ index 0000000000..9ecfa96bfd
 +    }
 +}
 diff --git a/src/com/android/settings/security/SecuritySettings.java b/src/com/android/settings/security/SecuritySettings.java
-index 643de279a4..77fa67855b 100644
+index 0076663587..ef92897f88 100644
 --- a/src/com/android/settings/security/SecuritySettings.java
 +++ b/src/com/android/settings/security/SecuritySettings.java
-@@ -109,6 +109,7 @@ public class SecuritySettings extends DashboardFragment {
-         securityPreferenceControllers.add(new ExecSpawnPreferenceController(context));
+@@ -110,6 +110,7 @@ public class SecuritySettings extends DashboardFragment {
          securityPreferenceControllers.add(new NativeDebugPreferenceController(context));
          securityPreferenceControllers.add(new HostsPreferenceController(context));
+         securityPreferenceControllers.add(new SigSpoofPreferenceController(context));
 +        securityPreferenceControllers.add(new OpenEuiccPreferenceController(context));
          controllers.add(new PreferenceCategoryController(context, SECURITY_CATEGORY)
                  .setChildren(securityPreferenceControllers));
