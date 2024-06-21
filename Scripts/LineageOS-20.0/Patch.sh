@@ -516,7 +516,7 @@ if enterAndClear "device/fxtec/pro1"; then
 echo "type qti_debugfs, fs_type, debugfs_type;" >> sepolicy/vendor/file.te; #fixup
 fi;
 
-for codename in barbet bramble coral crosshatch gs101 gs201 pantah raviole redbull redfin
+for codename in barbet bramble coral crosshatch gs101 gs201 lynx pantah raviole redbull redfin
 do
   if enterAndClear "device/google/$codename"; then
     (sed -i "/PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS/d" aosp_$codename.mk aosp_common.mk; git commit -am "Disable mainline checking") || true
@@ -598,7 +598,7 @@ done;
 
 cd "$DOS_BUILD_BASE"
 #Apply gesture input lib here for now
-for codename in barbet blueline bramble coral crosshatch flame panther raven redfin
+for codename in barbet blueline bramble coral crosshatch flame lynx panther raven redfin
 do
   if [[ -d vendor/google/"$codename" ]]; then
     [[ ! -f libjni_latinimegoogle.so ]] && curl -LO https://gitlab.com/MindTheGapps/vendor_gapps/-/raw/tau/arm64/proprietary/product/lib64/libjni_latinimegoogle.so
