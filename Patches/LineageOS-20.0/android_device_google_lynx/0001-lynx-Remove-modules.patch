@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Fri, 21 Jun 2024 17:46:58 -0400
+Subject: [PATCH] lynx: Remove modules
+
+Change-Id: Icb0d40570e4ba524682126f037ab70ec7f240f4b
+---
+ device-lineage.mk | 15 ---------------
+ vendor.prop       |  8 --------
+ 2 files changed, 23 deletions(-)
+
+diff --git a/device-lineage.mk b/device-lineage.mk
+index d32069d..46c97ae 100644
+--- a/device-lineage.mk
++++ b/device-lineage.mk
+@@ -7,17 +7,6 @@
+ # Overlays
+ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
+ 
+-# EUICC
+-PRODUCT_COPY_FILES += \
+-    frameworks/native/data/etc/android.hardware.telephony.euicc.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.telephony.euicc.xml
+-
+-PRODUCT_PACKAGES += \
+-    EuiccSupportPixelOverlay
+-
+-# HBM
+-PRODUCT_PACKAGES += \
+-    HbmSVManagerOverlayLynx
+-
+ # Build necessary packages for vendor
+ 
+ # Audio
+@@ -110,10 +99,6 @@ PRODUCT_PACKAGES += \
+ PRODUCT_PACKAGES += \
+     android.frameworks.stats-V1-ndk.vendor:32 \
+     android.hardware.authsecret@1.0.vendor:64 \
+-    android.hardware.biometrics.common-V2-ndk.vendor:64 \
+-    android.hardware.biometrics.face-V2-ndk.vendor:64 \
+-    android.hardware.biometrics.face@1.0.vendor:64 \
+-    android.hardware.biometrics.fingerprint-V2-ndk.vendor:64 \
+     android.hardware.input.common-V1-ndk.vendor:64 \
+     android.hardware.input.processor-V1-ndk.vendor:64 \
+     android.hardware.keymaster@3.0.vendor:64 \
+diff --git a/vendor.prop b/vendor.prop
+index cf31235..62e8e9c 100644
+--- a/vendor.prop
++++ b/vendor.prop
+@@ -1,13 +1,5 @@
+-# DRM
+-drm.service.enabled=true
+-media.mediadrmservice.enable=true
+-
+ # Radio
+-persist.vendor.ril.ecc.xml=1
+-persist.vendor.ril.support_nr_ds=1
+-persist.vendor.ril.use_radio_hal=2.0
+ ro.vendor.config.build_carrier=europen
+-vendor.rild.libpath=libsitril.so
+ 
+ # SSR
+ vendor.debug.ssrdump.type=sscoredump
