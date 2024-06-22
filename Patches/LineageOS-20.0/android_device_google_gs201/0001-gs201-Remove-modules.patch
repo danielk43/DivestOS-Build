@@ -7,7 +7,7 @@ Change-Id: I8ca38e274c43c5258c20c9e9bf53bf1cdfe151ba
 ---
  conf/init.gs201.rc                                   |  1 -
  device.mk                                            |  5 -----
- lineage_common.mk                                    |  7 -------
+ lineage_common.mk                                    | 12 ------------
  .../frameworks/base/core/res/res/values/config.xml   |  3 +--
  sepolicy/tracking_denials/bug_map                    |  1 -
  sepolicy/tracking_denials/hal_drm_widevine.te        |  2 --
@@ -17,7 +17,7 @@ Change-Id: I8ca38e274c43c5258c20c9e9bf53bf1cdfe151ba
  sepolicy/widevine/hal_drm_widevine.te                | 12 ------------
  sepolicy/widevine/service_contexts                   |  1 -
  widevine/device.mk                                   |  4 ----
- 12 files changed, 1 insertion(+), 48 deletions(-)
+ 12 files changed, 1 insertion(+), 53 deletions(-)
  delete mode 100644 sepolicy/tracking_denials/hal_drm_widevine.te
  delete mode 100644 sepolicy/widevine/file.te
  delete mode 100644 sepolicy/widevine/file_contexts
@@ -53,13 +53,18 @@ index 2d02158..86ee3fe 100644
  CHEETAH_PRODUCT := %cheetah
  LYNX_PRODUCT := %lynx
 diff --git a/lineage_common.mk b/lineage_common.mk
-index 431977d..db36932 100644
+index 431977d..5515c46 100644
 --- a/lineage_common.mk
 +++ b/lineage_common.mk
-@@ -21,15 +21,8 @@ ifeq ($(WITH_GMS),true)
- GMS_MAKEFILE=gms_64bit_only.mk
- endif
+@@ -16,20 +16,8 @@ PRODUCT_PRODUCT_PROPERTIES += \
+     ro.vendor.camera.extensions.package=com.google.android.apps.camera.services \
+     ro.vendor.camera.extensions.service=com.google.android.apps.camera.services.extensions.service.PixelExtensions
  
+-# GMS
+-ifeq ($(WITH_GMS),true)
+-GMS_MAKEFILE=gms_64bit_only.mk
+-endif
+-
 -# Google Assistant
 -PRODUCT_PRODUCT_PROPERTIES += ro.opa.eligible_device=true
 -
