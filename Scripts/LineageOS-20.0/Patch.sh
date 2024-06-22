@@ -98,7 +98,7 @@ sed -i '75i$(my_res_package): PRIVATE_AAPT_FLAGS += --auto-add-overlay' core/aap
 sed -i 's/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 23/PLATFORM_MIN_SUPPORTED_TARGET_SDK_VERSION := 28/' core/version_util.mk; #Set the minimum supported target SDK to Pie (GrapheneOS)
 sed -i "/Camera2/d" target/product/handheld_product.mk;
 sed -i "/android.hardware.biometrics.fingerprint/d" target/product/generic_system.mk;
-[[ -n ${AVB} ]] && applyPatch "$DOS_PATCHES/android_build/0002-Patch-makefile-for-custom-avb.patch"; #Add support for custom AVB key
+applyPatch "$DOS_PATCHES/android_build/0002-Patch-makefile-for-custom-avb.patch"; #Add support for custom AVB key
 fi;
 
 if enterAndClear "build/soong"; then
@@ -632,7 +632,7 @@ changeDefaultDNS; #Change the default DNS servers
 fixupCarrierConfigs || true; #Remove silly carrier restrictions
 removeUntrustedCerts || true;
 sed -i 's/SSLv23_NO_TLSv1_2/TLSv1_2/' device/*/*/gps*xml* device/*/*/location/gps*xml* device/*/*/gnss/*/config/gps*xml* || true; #Enforce TLSv1.2 for SUPL on Tensor devices (GrapheneOS)
-[[ -n ${AVB} ]] && source "$DOS_SCRIPTS_COMMON/Enable_Verity.sh"
+source "$DOS_SCRIPTS_COMMON/Enable_Verity.sh"
 cd "$DOS_BUILD_BASE";
 #rm -rfv device/*/*/overlay/CarrierConfigResCommon device/*/*/rro_overlays/CarrierConfigOverlay device/*/*/overlay/packages/apps/CarrierConfig/res/xml/vendor.xml;
 
