@@ -285,10 +285,10 @@ git revert --no-edit 09577521a65e1cef0560a84085fca46b1cf53803; #Fix invisible bu
 fi;
 
 if enterAndClear "packages/apps/CarrierConfig2"; then
-awk -i inplace '!/overrides/' Android.bp; #Don't replace CarrierConfig
+sed -i '/overrides/d' Android.bp; #Don't replace CarrierConfig
 sed -i -e '31,35d;' AndroidManifest.xml; #Fixups
 rm src/app/grapheneos/carrierconfig2/TestActivity.java src/app/grapheneos/carrierconfig2/loader/CmpTest.java;
-if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then sed -i 's|etc/CarrierSettings|etc/CarrierSettings2|' src/app/grapheneos/carrierconfig2/loader/CSettingsDir.java; fi; #Alter the search path
+sed -i 's|etc/CarrierSettings|etc/CarrierSettings2|' src/app/grapheneos/carrierconfig2/loader/CSettingsDir.java; #Alter the search path
 fi;
 
 if enterAndClear "packages/apps/CellBroadcastReceiver"; then
@@ -478,7 +478,7 @@ sed -i '/com.google.android/d' overlay/common/frameworks/base/core/res/res/value
 sed -i "s/Aperture/SecureCamera/" config/common_full.mk;
 sed -i "s/org.lineageos.aperture/app.grapheneos.camera/" overlay/common/frameworks/base/core/res/res/values/config.xml;
 sed -i "/Filter out random types/,/endif/d" config/version.mk; #Allow custom build types
-sed -i "s/Jelly/ChromePublic SystemWebView TrichromeChrome TrichromeLibrary TrichromeWebView/" config/common_mobile.mk; #Replace Jelly with Cromite browser
+sed -i "s/Jelly/ChromePublic SystemWebView TrichromeChrome TrichromeLibrary TrichromeWebView CarrierConfig2/" config/common_mobile.mk; #Replace Jelly with Cromite browser
 [[ ! "${WITH_GMS}" = true ]] && printf "\n\nPRODUCT_PACKAGES += AuroraStore Obtainium PdfViewer" | tee -a config/common_mobile.mk; #Add additional apks from android_vendor_partner_gms
 applyPatch "$DOS_PATCHES/android_vendor_lineage/0001-Update-webview-providers.patch"; #Allowlist webviews
 fi;
