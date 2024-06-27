@@ -123,8 +123,8 @@ applyPatch "$DOS_PATCHES/android_external_expat/0005-lib-Stop-leaking-opening-ta
 fi;
 
 if enterAndClear "external/SecureCamera"; then
-sed -i '/LOCAL_MODULE/s/Camera/SecureCamera/' Android.mk; #Change module name
-sed -i '11iLOCAL_OVERRIDES_PACKAGES := Aperture Camera Camera2 LegacyCamera Snap OpenCamera' Android.mk; #Replace the others
+sed -i '/name/s/Camera/SecureCamera/' Android.bp; #Change module name
+sed -i 's/preprocessed/presigned/' Android.bp;
 fi;
 
 if enterAndClear "external/hardened_malloc"; then
@@ -410,7 +410,7 @@ applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Networ
 fi;
 
 if enterAndClear "packages/services/Telephony"; then
-if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-CC2.patch"; fi; #Runtime control of platform carrier config package (DivestOS)
+applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-CC2.patch"; #Runtime control of platform carrier config package (DivestOS)
 fi;
 
 if enterAndClear "system/ca-certificates"; then
