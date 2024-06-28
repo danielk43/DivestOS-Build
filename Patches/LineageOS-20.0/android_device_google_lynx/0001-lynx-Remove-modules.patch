@@ -1,13 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: danielk43 <11856117+danielk43@users.noreply.github.com>
-Date: Fri, 21 Jun 2024 17:46:58 -0400
+Date: Thu, 27 Jun 2024 18:00:33 -0400
 Subject: [PATCH] lynx: Remove modules
 
-Change-Id: Icb0d40570e4ba524682126f037ab70ec7f240f4b
+Change-Id: I764d7ff49c1efb0408d7d95652ae8299666dda69
 ---
  device-lineage.mk | 15 ---------------
- vendor.prop       |  8 --------
- 2 files changed, 23 deletions(-)
+ vendor.prop       |  8 ++++----
+ 2 files changed, 4 insertions(+), 19 deletions(-)
 
 diff --git a/device-lineage.mk b/device-lineage.mk
 index d32069d..46c97ae 100644
@@ -43,20 +43,21 @@ index d32069d..46c97ae 100644
      android.hardware.input.processor-V1-ndk.vendor:64 \
      android.hardware.keymaster@3.0.vendor:64 \
 diff --git a/vendor.prop b/vendor.prop
-index cf31235..62e8e9c 100644
+index cf31235..e7575fe 100644
 --- a/vendor.prop
 +++ b/vendor.prop
-@@ -1,13 +1,5 @@
--# DRM
+@@ -1,10 +1,10 @@
+ # DRM
 -drm.service.enabled=true
 -media.mediadrmservice.enable=true
--
++drm.service.enabled=false
++media.mediadrmservice.enable=false
+ 
  # Radio
 -persist.vendor.ril.ecc.xml=1
 -persist.vendor.ril.support_nr_ds=1
--persist.vendor.ril.use_radio_hal=2.0
++persist.vendor.ril.ecc.xml=0
++persist.vendor.ril.support_nr_ds=0
+ persist.vendor.ril.use_radio_hal=2.0
  ro.vendor.config.build_carrier=europen
--vendor.rild.libpath=libsitril.so
- 
- # SSR
- vendor.debug.ssrdump.type=sscoredump
+ vendor.rild.libpath=libsitril.so
