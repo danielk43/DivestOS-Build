@@ -289,7 +289,7 @@ if enterAndClear "packages/apps/CarrierConfig2"; then
 sed -i '/overrides/d' Android.bp; #Don't replace CarrierConfig
 sed -i -e '31,35d;' AndroidManifest.xml; #Fixups
 rm src/app/grapheneos/carrierconfig2/TestActivity.java src/app/grapheneos/carrierconfig2/loader/CmpTest.java;
-sed -i 's|etc/CarrierSettings|etc/CarrierSettings2|' src/app/grapheneos/carrierconfig2/loader/CSettingsDir.java; #Alter the search path
+if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then sed -i 's|etc/CarrierSettings|etc/CarrierSettings2|' src/app/grapheneos/carrierconfig2/loader/CSettingsDir.java; fi; #Alter the search path
 fi;
 
 if enterAndClear "packages/apps/CellBroadcastReceiver"; then
@@ -410,7 +410,7 @@ applyPatch "$DOS_PATCHES/android_packages_providers_DownloadProvider/0001-Networ
 fi;
 
 if enterAndClear "packages/services/Telephony"; then
-applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-CC2.patch"; #Runtime control of platform carrier config package (DivestOS)
+if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$DOS_PATCHES/android_packages_services_Telephony/0001-CC2.patch"; fi; #Runtime control of platform carrier config package (DivestOS)
 fi;
 
 if enterAndClear "system/ca-certificates"; then
