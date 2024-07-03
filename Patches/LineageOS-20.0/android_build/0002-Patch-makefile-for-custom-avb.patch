@@ -8,7 +8,7 @@ Subject: [PATCH] Patch makefile for custom avb
  1 file changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/core/Makefile b/core/Makefile
-index c19b0754a..c63438007 100644
+index fb655cd09..3c602d384 100644
 --- a/core/Makefile
 +++ b/core/Makefile
 @@ -4357,16 +4357,19 @@ endef
