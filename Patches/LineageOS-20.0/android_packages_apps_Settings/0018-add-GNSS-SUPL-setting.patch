@@ -17,7 +17,7 @@ Subject: [PATCH] add GNSS SUPL setting
  create mode 100644 src/com/android/settings/location/GnssSuplPrefController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 27c7f9abc7..0ee8713400 100644
+index 7dcc89b560..74828aa770 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
 @@ -14614,4 +14614,10 @@
