@@ -696,9 +696,6 @@ sed -i '/BOARD_AVB_ENABLE := false/d' device/*/*/*.mk; #revert Lineage's signing
 sed -i '/hardware\/google\/pixel\/lineage_health\/device/d' device/*/*/*.mk;
 sed -i '/vendor.lineage.health-service.default/d' device/*/*/*.mk;
 
-#Don't trip rollback protection after October update
-sed -i 's/2023-09-05/2023-10-01/' device/google/redbull/device-common.mk device/google/sunfish/device-common.mk device/google/gs201/device.mk device/google/gs101/device.mk || true;
-
 #
 #END OF DEVICE CHANGES
 #
