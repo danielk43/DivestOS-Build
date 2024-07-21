@@ -6,9 +6,9 @@ Subject: [PATCH] add a setting for forcibly disabling SUPL
 Change-Id: I5c31c319d198f09ace493e601278f8224a259f05
 ---
  core/java/android/provider/Settings.java          |  9 +++++++++
- .../server/location/gnss/GnssConfiguration.java   | 14 ++++++++++++++
+ .../server/location/gnss/GnssConfiguration.java   | 13 +++++++++++++
  .../location/gnss/GnssLocationProvider.java       | 15 +++++++++++++++
- 3 files changed, 38 insertions(+)
+ 3 files changed, 37 insertions(+)
 
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
 index c0f9a1ad6be2..2b4836861219 100644
@@ -31,10 +31,10 @@ index c0f9a1ad6be2..2b4836861219 100644
           * The amount of time in milliseconds before a disconnected Wi-Fi adapter is turned off
           * @hide
 diff --git a/services/core/java/com/android/server/location/gnss/GnssConfiguration.java b/services/core/java/com/android/server/location/gnss/GnssConfiguration.java
-index a5939e924adb..7cdf29223fc7 100644
+index a5939e924adb..919ce406f129 100644
 --- a/services/core/java/com/android/server/location/gnss/GnssConfiguration.java
 +++ b/services/core/java/com/android/server/location/gnss/GnssConfiguration.java
-@@ -20,11 +20,13 @@ import android.content.Context;
+@@ -20,6 +20,7 @@ import android.content.Context;
  import android.location.flags.Flags;
  import android.os.PersistableBundle;
  import android.os.SystemProperties;
@@ -42,13 +42,7 @@ index a5939e924adb..7cdf29223fc7 100644
  import android.telephony.CarrierConfigManager;
  import android.telephony.SubscriptionManager;
  import android.telephony.TelephonyManager;
- import android.text.TextUtils;
- import android.util.Log;
-+import android.util.Slog;
- 
- import com.android.internal.util.FrameworkStatsLog;
- 
-@@ -296,6 +298,7 @@ public class GnssConfiguration {
+@@ -296,6 +297,7 @@ public class GnssConfiguration {
           */
          loadPropertiesFromGpsDebugConfig(mProperties, DEBUG_PROPERTIES_VENDOR_FILE);
          loadPropertiesFromGpsDebugConfig(mProperties, DEBUG_PROPERTIES_SYSTEM_FILE);
@@ -56,7 +50,7 @@ index a5939e924adb..7cdf29223fc7 100644
          mEsExtensionSec = getRangeCheckedConfigEsExtensionSec();
  
          logConfigurations();
-@@ -514,4 +517,15 @@ public class GnssConfiguration {
+@@ -514,4 +516,15 @@ public class GnssConfiguration {
      private static native boolean native_set_satellite_blocklist(int[] constellations, int[] svIds);
  
      private static native boolean native_set_es_extension_sec(int emergencyExtensionSeconds);

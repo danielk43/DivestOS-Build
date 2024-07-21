@@ -203,7 +203,7 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0041-tile_restrictions.patch"; 
 applyPatch "$DOS_PATCHES/android_frameworks_base/0042-minimal_screenshot_exif.patch"; #Put bare minimum metadata in screenshots (CalyxOS)
 #applyPatch "$DOS_PATCHES/android_frameworks_base/0043-Smart_Pixels.patch"; #Smart Pixels (various)
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0039-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/0099-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS)
 hardenLocationConf services/core/java/com/android/server/location/gnss/gps_debug.conf; #Harden the default GPS config
 sed -i 's/DEFAULT_USE_COMPACTION = false;/DEFAULT_USE_COMPACTION = true;/' services/core/java/com/android/server/am/CachedAppOptimizer.java; #Enable app compaction by default (GrapheneOS)
 sed -i 's/DEFAULT_MAX_FILES = 1000;/DEFAULT_MAX_FILES = 0;/' services/core/java/com/android/server/DropBoxManagerService.java; #Disable DropBox internal logging service
@@ -346,7 +346,7 @@ if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$D
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels.patch"; #Smart Pixels (CarbonROM/various)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels-a1.patch"; #Fix long click intent for Smart Pixels tile (crDroid/various)
 applyPatch "$DOS_PATCHES_COMMON/android_packages_apps_Settings/0001-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0099-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS)
 fi;
 
 if enterAndClear "packages/apps/SetupWizard"; then
@@ -358,7 +358,6 @@ git revert --no-edit fcf658d2005dc557a95d5a7fb89cb90d06b31d33; #grant permission
 fi;
 
 # if enterAndClear "packages/apps/Trebuchet"; then
-# git am $DOS_PATCHES/ASB-2023-10/launcher-*.patch;
 # applyPatch "$DOS_PATCHES/android_packages_apps_Trebuchet/361248.patch"; #Launcher3: Allow toggling monochrome icons for all apps
 # cp $DOS_BUILD_BASE/vendor/divested/overlay/common/packages/apps/Trebuchet/res/xml/default_workspace_*.xml res/xml/; #XXX: Likely no longer needed
 # fi;

@@ -146,17 +146,17 @@ index 18e95781a32c..32e1aebaedb3 100644
      };
  
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java
-index b275b3f35fa4..ed87f389c168 100644
+index b275b3f35fa4..96bcd0f6bc7d 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java
-@@ -21,6 +21,7 @@ import static com.android.systemui.Flags.truncatedStatusBarIconsFix;
- 
+@@ -22,6 +22,7 @@ import static com.android.systemui.Flags.truncatedStatusBarIconsFix;
  import android.annotation.Nullable;
  import android.content.Context;
-+import android.content.res.Resources;
  import android.content.res.Configuration;
++import android.content.res.Resources;
  import android.graphics.Insets;
  import android.graphics.Rect;
+ import android.inputmethodservice.InputMethodService;
 @@ -69,6 +70,13 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
      private final StatusBarContentInsetsProvider mContentInsetsProvider;
      private final StatusBarWindowController mStatusBarWindowController;
