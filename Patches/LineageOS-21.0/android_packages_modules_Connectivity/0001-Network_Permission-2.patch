@@ -9,7 +9,7 @@ Subject: [PATCH] don't crash INTERNET-unaware apps that try to access
  1 file changed, 33 insertions(+), 5 deletions(-)
 
 diff --git a/framework-t/src/android/net/nsd/NsdManager.java b/framework-t/src/android/net/nsd/NsdManager.java
-index 1001423732..d3110e49d9 100644
+index 1001423732..bd08fcd2e6 100644
 --- a/framework-t/src/android/net/nsd/NsdManager.java
 +++ b/framework-t/src/android/net/nsd/NsdManager.java
 @@ -723,11 +723,39 @@ public final class NsdManager {
@@ -26,13 +26,13 @@ index 1001423732..d3110e49d9 100644
 +            mService = new INsdServiceConnector() {
 +                final NsdCallbackImpl callback = new NsdCallbackImpl(mHandler);
 +
-+                @Override public void registerService(int listenerKey, NsdServiceInfo serviceInfo) {
++                @Override public void registerService(int listenerKey, AdvertisingRequest advertisingRequest) {
 +                    callback.onRegisterServiceFailed(listenerKey, FAILURE_INTERNAL_ERROR);
 +                }
 +                @Override public void unregisterService(int listenerKey) {
 +                    callback.onUnregisterServiceFailed(listenerKey, FAILURE_INTERNAL_ERROR);
 +                }
-+                @Override public void discoverServices(int listenerKey, NsdServiceInfo serviceInfo) {
++                @Override public void discoverServices(int listenerKey, DiscoveryRequest discoveryRequest) {
 +                    callback.onDiscoverServicesFailed(listenerKey, FAILURE_INTERNAL_ERROR);
 +                }
 +                @Override public void stopDiscovery(int listenerKey) {
