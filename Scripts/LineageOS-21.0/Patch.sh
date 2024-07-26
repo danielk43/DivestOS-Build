@@ -357,6 +357,13 @@ applyPatch "$DOS_PATCHES/android_packages_inputmethods_LatinIME/0001-Voice.patch
 applyPatch "$DOS_PATCHES/android_packages_inputmethods_LatinIME/0002-Disable_Personalization.patch"; #Disable personalization dictionary by default (GrapheneOS)
 fi;
 
+if enterAndClear "packages/modules/Connectivity"; then
+applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-1.patch"; #Enforce INTERNET permission per-uid instead of per-appId (GrapheneOS) #XXX: 21REBASE PROBABLY BROKEN
+applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-2.patch"; #Don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS) # Rebased (dk)
+applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-3.patch"; #ConnectivityManager: pretend that network is down to INTERNET-unaware callers (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-4.patch"; #Fixup! don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS)
+fi;
+
 if enterAndClear "packages/modules/DnsResolver"; then
         applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Cache.patch"; #DnsResolver: Sort and cache hosts file data for fast lookup (tdm) # Rebased (dk)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Wildcards.patch"; #DnsResolver: Support wildcards in cached hosts file (tdm)
