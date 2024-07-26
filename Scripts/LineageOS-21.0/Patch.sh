@@ -361,7 +361,7 @@ fi;
 
 if enterAndClear "packages/modules/Connectivity"; then
 applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-1.patch"; #Enforce INTERNET permission per-uid instead of per-appId (GrapheneOS) #XXX: 21REBASE PROBABLY BROKEN
-applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-2.patch"; #Don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-2.patch"; #Don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS) # Rebased (dk)
 applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-3.patch"; #ConnectivityManager: pretend that network is down to INTERNET-unaware callers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Permission-4.patch"; #Fixup! don't crash INTERNET-unaware apps that try to access NsdManager (GrapheneOS)
 fi;
