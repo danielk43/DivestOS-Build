@@ -10,10 +10,10 @@ Subject: [PATCH] enforce INTERNET permission per-uid instead of per-appId
  2 files changed, 48 insertions(+), 25 deletions(-)
 
 diff --git a/bpf_progs/netd.c b/bpf_progs/netd.c
-index 59bbfbae51..6bcc863043 100644
+index 0fad7ecb6e..9542ab8a03 100644
 --- a/bpf_progs/netd.c
 +++ b/bpf_progs/netd.c
-@@ -653,14 +653,8 @@ DEFINE_XTBPF_PROG("skfilter/denylist/xtbpf", AID_ROOT, AID_NET_ADMIN, xt_bpf_den
+@@ -664,14 +664,8 @@ DEFINE_XTBPF_PROG("skfilter/denylist/xtbpf", AID_ROOT, AID_NET_ADMIN, xt_bpf_den
  }
  
  static __always_inline inline uint8_t get_app_permissions(uint32_t uid) {
