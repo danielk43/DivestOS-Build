@@ -1,5 +1,6 @@
 #!/bin/bash
-if cd "$DOS_BUILD_BASE""kernel/google/gs101/private/gs-google"; then
+if cd "$DOS_BUILD_BASE/kernel/google/gs101/private/gs-google"; then
+git reset --hard && git clean -fdx
 git apply $DOS_PATCHES_LINUX_CVES/0001-LinuxIncrementals/5.10/5.10.0166-0167.patch --exclude=Makefile
 git apply $DOS_PATCHES_LINUX_CVES/0003-syzkaller-Misc2/ANY/0001.patch
 git apply $DOS_PATCHES_LINUX_CVES/0005-Graphene-Deny_USB/5.10/0005.patch

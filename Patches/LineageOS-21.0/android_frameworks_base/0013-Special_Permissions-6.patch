@@ -14,14 +14,13 @@ declaration inside <application> element in its AndroidManifest, or is a system 
  core/java/android/app/DownloadManager.java    | 13 ++++++++++++
  .../content/pm/AppPermissionUtils.java        |  7 +++++++
  .../pm/SpecialRuntimePermAppUtils.java        | 20 +++++++++++++++++++
- .../permission/SpecialRuntimePermUtils.java   | 17 ++++++++++++++++
- 5 files changed, 62 insertions(+)
+ 4 files changed, 45 insertions(+)
 
 diff --git a/core/api/system-current.txt b/core/api/system-current.txt
-index 38e4b74acc38..d7461cbb5be3 100644
+index 373f48e937dd..bbbac378487b 100644
 --- a/core/api/system-current.txt
 +++ b/core/api/system-current.txt
-@@ -4176,6 +4176,11 @@ package android.content.pm {
+@@ -4413,6 +4413,11 @@ package android.content.pm {
    }
  
    public class SpecialRuntimePermAppUtils {
@@ -79,7 +78,7 @@ index de0244f3934f..6285f4745c37 100644
          if (underlyingCursor == null) {
              return null;
 diff --git a/core/java/android/content/pm/AppPermissionUtils.java b/core/java/android/content/pm/AppPermissionUtils.java
-index 7dc20eec8485..6a96f70dcfcf 100644
+index 27ff690c3408..44bf5332b42e 100644
 --- a/core/java/android/content/pm/AppPermissionUtils.java
 +++ b/core/java/android/content/pm/AppPermissionUtils.java
 @@ -24,6 +24,13 @@ public class AppPermissionUtils {
@@ -95,7 +94,7 @@ index 7dc20eec8485..6a96f70dcfcf 100644
 +
          return false;
      }
- }
+     private AppPermissionUtils() {}
 diff --git a/core/java/android/content/pm/SpecialRuntimePermAppUtils.java b/core/java/android/content/pm/SpecialRuntimePermAppUtils.java
 index efd48cb49aa3..2f973a585d5c 100644
 --- a/core/java/android/content/pm/SpecialRuntimePermAppUtils.java
@@ -130,36 +129,3 @@ index efd48cb49aa3..2f973a585d5c 100644
      private static int getFlags() {
          int cache = cachedFlags;
          if (cache != 0) {
-diff --git a/services/core/java/com/android/server/pm/permission/SpecialRuntimePermUtils.java b/services/core/java/com/android/server/pm/permission/SpecialRuntimePermUtils.java
-index fe946ff5d5ca..6f5cabb8a8fc 100644
---- a/services/core/java/com/android/server/pm/permission/SpecialRuntimePermUtils.java
-+++ b/services/core/java/com/android/server/pm/permission/SpecialRuntimePermUtils.java
-@@ -34,11 +34,28 @@ public class SpecialRuntimePermUtils {
-         for (ParsedUsesPermission perm : pkg.getUsesPermissions()) {
-             String name = perm.getName();
-             switch (name) {
-+                case Manifest.permission.INTERNET:
-+                    flags |= FLAG_REQUESTS_INTERNET_PERMISSION;
-+                    continue;
-                 default:
-                     continue;
-             }
-         }
- 
-+        if ((flags & FLAG_REQUESTS_INTERNET_PERMISSION) != 0) {
-+            if (pkg.isSystem()) {
-+                flags |= FLAG_AWARE_OF_RUNTIME_INTERNET_PERMISSION;
-+            } else {
-+                Bundle metadata = pkg.getMetaData();
-+                if (metadata != null) {
-+                    String key = Manifest.permission.INTERNET + ".mode";
-+                    if ("runtime".equals(metadata.getString(key))) {
-+                        flags |= FLAG_AWARE_OF_RUNTIME_INTERNET_PERMISSION;
-+                    }
-+                }
-+            }
-+        }
-+
-         return flags;
-     }
- 

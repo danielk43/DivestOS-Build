@@ -10,10 +10,10 @@ Subject: [PATCH] perform additional boot-time checks on system package updates
  create mode 100644 services/core/java/com/android/server/pm/PackageVerityExt.java
 
 diff --git a/services/core/java/com/android/server/pm/InstallPackageHelper.java b/services/core/java/com/android/server/pm/InstallPackageHelper.java
-index 2ed4dfa4e8db..8ebfc9c4bb74 100644
+index 89c4f0f276af..48e33532d0f3 100644
 --- a/services/core/java/com/android/server/pm/InstallPackageHelper.java
 +++ b/services/core/java/com/android/server/pm/InstallPackageHelper.java
-@@ -3960,6 +3960,13 @@ final class InstallPackageHelper {
+@@ -4005,6 +4005,13 @@ final class InstallPackageHelper {
              @Nullable UserHandle user) throws PackageManagerException {
          final boolean scanSystemPartition =
                  (parseFlags & ParsingPackageUtils.PARSE_IS_SYSTEM_DIR) != 0;
