@@ -62,10 +62,10 @@ In both cases, applying this patch fixes the issue.
  3 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/apex/jobscheduler/framework/java/com/android/server/DeviceIdleInternal.java b/apex/jobscheduler/framework/java/com/android/server/DeviceIdleInternal.java
-index caf7e7f4a4ed..1b1d2252dae1 100644
+index 1fc888b06ffd..b18f43e0b538 100644
 --- a/apex/jobscheduler/framework/java/com/android/server/DeviceIdleInternal.java
 +++ b/apex/jobscheduler/framework/java/com/android/server/DeviceIdleInternal.java
-@@ -73,7 +73,7 @@ public interface DeviceIdleInternal {
+@@ -74,7 +74,7 @@ public interface DeviceIdleInternal {
  
      boolean isAppOnWhitelist(int appid);
  
@@ -75,10 +75,10 @@ index caf7e7f4a4ed..1b1d2252dae1 100644
      int[] getPowerSaveTempWhitelistAppIds();
  
 diff --git a/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java b/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java
-index 6383ed873e59..f5289001cc32 100644
+index 50bb2c104ee4..bbabc681d73c 100644
 --- a/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java
 +++ b/apex/jobscheduler/service/java/com/android/server/DeviceIdleController.java
-@@ -2375,14 +2375,14 @@ public class DeviceIdleController extends SystemService
+@@ -2386,14 +2386,14 @@ public class DeviceIdleController extends SystemService
          }
  
          /**
