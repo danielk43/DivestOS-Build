@@ -40,7 +40,7 @@ index 8b8d361edbd4..60aa5e4267aa 100644
           "(Ljava/lang/String;IIII[B"
           "Lcom/android/commands/hid/Device$DeviceCallback;)J",
 diff --git a/cmds/uinput/jni/com_android_commands_uinput_Device.cpp b/cmds/uinput/jni/com_android_commands_uinput_Device.cpp
-index a78a46504684..5752be8829cb 100644
+index bd61000186e5..3179c8a28e47 100644
 --- a/cmds/uinput/jni/com_android_commands_uinput_Device.cpp
 +++ b/cmds/uinput/jni/com_android_commands_uinput_Device.cpp
 @@ -325,7 +325,7 @@ static jint getEvdevInputPropByLabel(JNIEnv* env, jclass /* clazz */, jstring ra
@@ -53,7 +53,7 @@ index a78a46504684..5752be8829cb 100644
           "(Ljava/lang/String;IIIIIILjava/lang/String;"
           "Lcom/android/commands/uinput/Device$DeviceCallback;)J",
 diff --git a/core/jni/LayoutlibLoader.cpp b/core/jni/LayoutlibLoader.cpp
-index 200ddefc3bbc..e7acbdfbddf6 100644
+index d5f17da0a072..05c6388aa445 100644
 --- a/core/jni/LayoutlibLoader.cpp
 +++ b/core/jni/LayoutlibLoader.cpp
 @@ -69,7 +69,7 @@ static void NativeAllocationRegistry_Delegate_nativeApplyFreeFunction(JNIEnv*, j
@@ -343,10 +343,10 @@ index 69e48184c0ad..612fc95776a5 100644
  };
  
 diff --git a/core/jni/android_os_HwBinder.cpp b/core/jni/android_os_HwBinder.cpp
-index 781895eeeaba..cbec79144826 100644
+index 734b5f497e2e..d6c1e00d9b4a 100644
 --- a/core/jni/android_os_HwBinder.cpp
 +++ b/core/jni/android_os_HwBinder.cpp
-@@ -352,7 +352,7 @@ static void JHwBinder_report_sysprop_change(JNIEnv * /*env*/, jclass /*clazz*/)
+@@ -396,7 +396,7 @@ static void JHwBinder_report_sysprop_change(JNIEnv * /*env*/, jclass /*clazz*/)
      report_sysprop_change();
  }
  
@@ -443,10 +443,10 @@ index d1ce30a3e827..d93bda166c44 100644
        "(Landroid/view/Surface;)V",
        (void *)android_media_MediaSync_native_setSurface },
 diff --git a/media/jni/soundpool/android_media_SoundPool.cpp b/media/jni/soundpool/android_media_SoundPool.cpp
-index 25040a942061..f62c4340428c 100644
+index e872a58c96cf..fd6fb80d6867 100644
 --- a/media/jni/soundpool/android_media_SoundPool.cpp
 +++ b/media/jni/soundpool/android_media_SoundPool.cpp
-@@ -560,7 +560,7 @@ android_media_SoundPool_release(JNIEnv *env, jobject thiz)
+@@ -563,7 +563,7 @@ android_media_SoundPool_release(JNIEnv *env, jobject thiz)
  // ----------------------------------------------------------------------------
  
  // Dalvik VM type signatures
@@ -469,11 +469,11 @@ index 93938b1ff1bc..47b22c5fd39f 100644
           (void *)android_server_UsbAlsaMidiDevice_open},
          {"nativeClose", "([Ljava/io/FileDescriptor;)V",
 diff --git a/services/core/jni/com_android_server_companion_virtual_InputController.cpp b/services/core/jni/com_android_server_companion_virtual_InputController.cpp
-index 4cd018b0269e..039258cf983c 100644
+index 50d48b7d30e7..12afdeaf0a38 100644
 --- a/services/core/jni/com_android_server_companion_virtual_InputController.cpp
 +++ b/services/core/jni/com_android_server_companion_virtual_InputController.cpp
-@@ -287,7 +287,7 @@ static bool nativeWriteScrollEvent(JNIEnv* env, jobject thiz, jlong ptr, jfloat
-                                           std::chrono::nanoseconds(eventTimeNanos));
+@@ -381,7 +381,7 @@ static bool nativeWriteStylusButtonEvent(JNIEnv* env, jobject thiz, jlong ptr, j
+                                            std::chrono::nanoseconds(eventTimeNanos));
  }
  
 -static JNINativeMethod methods[] = {
