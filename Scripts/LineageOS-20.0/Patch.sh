@@ -17,6 +17,9 @@
 umask 0022;
 set -euo pipefail;
 
+[[ -f /.dockerenv ]] && export GIT_COMMITTER_NAME=${USER_NAME}
+[[ -f /.dockerenv ]] && export GIT_COMMITTER_EMAIL=${USER_EMAIL}
+
 export DOS_WORKSPACE_ROOT=${GIT_LOCAL}"/DivestOS-Build/"; #XXX: Set to project root for this fork.
 source "$DOS_WORKSPACE_ROOT/Scripts/init.sh"
 
