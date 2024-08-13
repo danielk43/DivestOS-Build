@@ -128,16 +128,17 @@ export -f gpgVerifyGitHead;
 # only version must be numeric
 
 os_name () {
-  if [[ -n ${ANDROID_BUILD_TOP} ]]; then
-    printf $(basename ${ANDROID_BUILD_TOP})
-  else
-    printf $(basename ${PWD})
-  fi
+  grep -q grapheneos .repo/manifests/default.xml && printf grapheneos
+  grep -q lineageos .repo/manifests/default.xml && printf lineageos
 }
 
 OS_NAME=$(os_name)
 os_version () {
-  printf ${OS_NAME##*-}
+  if [[ -n "${android_version}" ]]; then
+    printf ${android_version}
+  else
+    printf $(grep refs/heads .repo/manifests/default.xml | cut -d\" -f2 | cut -d\/ -f3 | cut -d- -f2 | uniq)
+  fi
 }
 
 if [[ ${OS_NAME,,} =~ "lineage" ]]; then
