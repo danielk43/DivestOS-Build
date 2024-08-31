@@ -134,8 +134,8 @@ os_name () {
 
 OS_NAME=$(os_name)
 os_version () {
-  if [[ -n "${android_version}" ]]; then
-    printf ${android_version}
+  if [[ -n "${android_version_number}" ]]; then
+    printf ${android_version_number}
   else
     printf $(grep refs/heads .repo/manifests/default.xml | cut -d\" -f2 | cut -d\/ -f3 | cut -d- -f2 | uniq)
   fi
