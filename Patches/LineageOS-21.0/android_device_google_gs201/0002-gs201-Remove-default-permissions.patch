@@ -9,10 +9,10 @@ Change-Id: Iace2da395a92607c4d4a92bc6e46f31bf65c7a97
  1 file changed, 1 deletion(-)
 
 diff --git a/device.mk b/device.mk
-index 4182c29d..88599cc1 100644
+index 4fe55cc4..bdfdee04 100644
 --- a/device.mk
 +++ b/device.mk
-@@ -975,7 +975,6 @@ include device/google/gs-common/sensors/sensors.mk
+@@ -951,7 +951,6 @@ include device/google/gs-common/sensors/sensors.mk
  $(call soong_config_set,usf,target_soc,gs201)
  
  PRODUCT_COPY_FILES += \

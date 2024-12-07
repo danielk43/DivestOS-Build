@@ -17,10 +17,10 @@ Subject: [PATCH] add GNSS SUPL setting
  create mode 100644 src/com/android/settings/location/GnssSuplPrefController.java
 
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 44aacacb5a7..ef1ec839670 100644
+index 5d99076843f..91269de0815 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -13085,4 +13085,12 @@
+@@ -13082,4 +13082,12 @@
  
      <!--Text for Stylus Pointer Icon preference -->
      <string name="show_stylus_pointer_icon">Show pointer while hovering</string>

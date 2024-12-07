@@ -23,11 +23,11 @@ This is an effective merge + tweak of two existing patches, credits:
 
 Change-Id: I64a252aac9bb196a11ed7b4b5d8c7e59a3413bd4
 ---
- .../android/content/pm/SigningDetails.java    | 36 ++++++++-
+ .../android/content/pm/SigningDetails.java    | 36 +++++++++-
  core/res/res/values/config.xml                |  2 +
  .../com/android/server/pm/AppsFilterImpl.java | 17 +++++
- .../com/android/server/pm/ComputerEngine.java | 73 +++++++++++++++++--
- 4 files changed, 121 insertions(+), 7 deletions(-)
+ .../com/android/server/pm/ComputerEngine.java | 70 +++++++++++++++++--
+ 4 files changed, 118 insertions(+), 7 deletions(-)
 
 diff --git a/core/java/android/content/pm/SigningDetails.java b/core/java/android/content/pm/SigningDetails.java
 index bb09ad23f6ec..38f9a41bae90 100644
@@ -99,10 +99,10 @@ index 34ddab5adae1..1dcc8c93fe31 100644
  
     <!-- Package name of the extension software fallback. -->
 diff --git a/services/core/java/com/android/server/pm/AppsFilterImpl.java b/services/core/java/com/android/server/pm/AppsFilterImpl.java
-index cc4c2b5bf893..c774c88f1da6 100644
+index 57263da936d6..a7fb42890a3e 100644
 --- a/services/core/java/com/android/server/pm/AppsFilterImpl.java
 +++ b/services/core/java/com/android/server/pm/AppsFilterImpl.java
-@@ -555,6 +555,15 @@ public final class AppsFilterImpl extends AppsFilterLocked implements Watchable,
+@@ -556,6 +556,15 @@ public final class AppsFilterImpl extends AppsFilterLocked implements Watchable,
          }
      }
  
@@ -118,7 +118,7 @@ index cc4c2b5bf893..c774c88f1da6 100644
      /**
       * @return Additional packages that may have had their viewing visibility changed and may need
       * to be updated in the cache. Returns null if there are no additional packages.
-@@ -596,9 +605,17 @@ public final class AppsFilterImpl extends AppsFilterLocked implements Watchable,
+@@ -597,9 +606,17 @@ public final class AppsFilterImpl extends AppsFilterLocked implements Watchable,
  
          final boolean newIsForceQueryable;
          synchronized (mForceQueryableLock) {
@@ -133,11 +133,11 @@ index cc4c2b5bf893..c774c88f1da6 100644
                              /* shared user that is already force queryable */
                              || newPkgSetting.isForceQueryableOverride() /* adb override */
 +                            || isMicroG
+                             || (newPkg.isForceQueryable() && isMicrogSigned(newPkg))
                              || (newPkgSetting.isSystem() && (mSystemAppsQueryable
                              || newPkg.isForceQueryable()
-                             || ArrayUtils.contains(mForceQueryableByDevicePackageNames,
 diff --git a/services/core/java/com/android/server/pm/ComputerEngine.java b/services/core/java/com/android/server/pm/ComputerEngine.java
-index 0b34228a5965..bf53cb09e358 100644
+index cbe10c24f7eb..01c8cfc6fc4b 100644
 --- a/services/core/java/com/android/server/pm/ComputerEngine.java
 +++ b/services/core/java/com/android/server/pm/ComputerEngine.java
 @@ -86,6 +86,7 @@ import android.content.pm.InstantAppResolveInfo;
@@ -148,7 +148,7 @@ index 0b34228a5965..bf53cb09e358 100644
  import android.content.pm.PackageManager;
  import android.content.pm.PackageManagerInternal;
  import android.content.pm.ParceledListSlice;
-@@ -106,6 +107,7 @@ import android.os.IBinder;
+@@ -107,6 +108,7 @@ import android.os.IBinder;
  import android.os.ParcelableException;
  import android.os.PatternMatcher;
  import android.os.Process;
@@ -156,7 +156,7 @@ index 0b34228a5965..bf53cb09e358 100644
  import android.os.Trace;
  import android.os.UserHandle;
  import android.os.UserManager;
-@@ -1493,18 +1495,34 @@ public class ComputerEngine implements Computer {
+@@ -1546,18 +1548,34 @@ public class ComputerEngine implements Computer {
              // Compute GIDs only if requested
              final int[] gids = (flags & PackageManager.GET_GIDS) == 0 ? EMPTY_INT_ARRAY
                      : mPermissionManager.getGidsForUid(UserHandle.getUid(userId, ps.getAppId()));
@@ -196,7 +196,7 @@ index 0b34228a5965..bf53cb09e358 100644
  
              if (packageInfo == null) {
                  return null;
-@@ -1565,6 +1583,34 @@ public class ComputerEngine implements Computer {
+@@ -1618,6 +1636,34 @@ public class ComputerEngine implements Computer {
          }
      }
  
@@ -231,24 +231,21 @@ index 0b34228a5965..bf53cb09e358 100644
      public final PackageInfo getPackageInfo(String packageName,
              @PackageManager.PackageInfoFlagsBits long flags, int userId) {
          return getPackageInfoInternal(packageName, PackageManager.VERSION_CODE_HIGHEST,
-@@ -5104,6 +5150,20 @@ public class ComputerEngine implements Computer {
+@@ -5157,6 +5203,20 @@ public class ComputerEngine implements Computer {
              return null;
          }
  
 +        if (SystemProperties.getBoolean(MICROG_ENABLEMENT, false)) {
 +            InstallSource installSource = ps.getInstallSource();
-+            final String installerPackageName = installSource.mInstallerPackageName;
-+            if (installSource != null && installerPackageName != null
++            if (installSource != null && installSource.installerPackageName != null
 +                    && mSettings.getPackage(PACKAGE_PLAY_STORE) != null
 +                    && callingUid != Process.SYSTEM_UID
-+                    && ArrayUtils.contains(PACKAGES_SPOOF_INSTALLSOURCE, installerPackageName)) {
-+                return InstallSource.create(PACKAGE_PLAY_STORE, PACKAGE_PLAY_STORE, PACKAGE_PLAY_STORE,
-+                                installSource.mInstallerPackageUid, // FIXME: likely wrong
-+                                installSource.mUpdateOwnerPackageName,
-+                                installSource.mInstallerAttributionTag,
-+                                PackageInstaller.PACKAGE_SOURCE_STORE)
++                    && ArrayUtils.contains(PACKAGES_SPOOF_INSTALLSOURCE, installSource.installerPackageName)) {
++                return InstallSource.create(PACKAGE_PLAY_STORE, PACKAGE_PLAY_STORE, PACKAGE_PLAY_STORE, null,
++                                PackageInstaller.PACKAGE_SOURCE_STORE,
++                                ps.getInstallSource().isOrphaned, false)
 +                        .setInitiatingPackageSignatures(new PackageSignatures(
-+                        mSettings.getPackage(PACKAGE_PLAY_STORE).getSigningDetails()));
++                                mSettings.getPackage(PACKAGE_PLAY_STORE).getSigningDetails()));
 +            }
 +        }
 +

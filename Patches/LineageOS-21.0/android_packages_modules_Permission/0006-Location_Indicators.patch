@@ -11,10 +11,10 @@ integrate better with the new camera and microphone indicators.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/PermissionController/src/com/android/permissioncontroller/permission/utils/KotlinUtils.kt b/PermissionController/src/com/android/permissioncontroller/permission/utils/KotlinUtils.kt
-index 3fcc88854..c87dde293 100644
+index 2f7ac01fa..2c50fd3e6 100644
 --- a/PermissionController/src/com/android/permissioncontroller/permission/utils/KotlinUtils.kt
 +++ b/PermissionController/src/com/android/permissioncontroller/permission/utils/KotlinUtils.kt
-@@ -197,7 +197,7 @@ object KotlinUtils {
+@@ -198,7 +198,7 @@ object KotlinUtils {
              DeviceConfig.getBoolean(
                  DeviceConfig.NAMESPACE_PRIVACY,
                  PROPERTY_LOCATION_INDICATORS_ENABLED,

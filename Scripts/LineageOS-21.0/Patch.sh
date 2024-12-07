@@ -138,14 +138,12 @@ fi;
 
 if enterAndClear "external/SecureCamera"; then
 sed -i '/name/s/Camera/SecureCamera/' Android.bp; #Change module name
-sed -i 's/preprocessed/presigned/' Android.bp;
+# sed -i 's/preprocessed/presigned/' Android.bp;
 fi;
 
 if enterAndClear "frameworks/base"; then 
-git revert --no-edit -X ours 32602dc51dc88664133eaa905bee62ed20c40c43; #Reverts "JobScheduler: Respect allow-in-power-save perm" in favor of below patch # Conflict (dk)
-git revert --no-edit -X ours f9b5586a3887e70aa5580f8073611826eed2b88f; #Reverts "Remove sensitive info from SUPL requests" in favor of below patch # Conflict (dk)
+git revert --no-edit f9b5586a3887e70aa5580f8073611826eed2b88f; #Reverts "Remove sensitive info from SUPL requests" in favor of below patch
 git revert --no-edit 18f3b5a2615efe61636ff952b500b19d891bdc80; #Reverts "fixup! Allow signature spoofing for microG Companion/Services" in favor of below patch
-git revert --no-edit -X ours 6b793fa98a40dd6c2d6eb02988161ed123439428; #Reverts "Allow signature spoofing for microG Companion/Services" in favor of below patch # Conflict (dk)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0007-Always_Restict_Serial.patch"; #Always restrict access to Build.SERIAL (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0008-Browser_No_Location.patch"; #Don't grant location permission to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0003-SUPL_No_IMSI.patch"; #Don't send IMSI to SUPL (MSe1969)
@@ -265,16 +263,16 @@ applyPatch "$DOS_PATCHES/android_libcore/0003-Exec_Based_Spawning-1.patch"; #Add
 applyPatch "$DOS_PATCHES/android_libcore/0003-Exec_Based_Spawning-2.patch";
 fi;
 
-if enterAndClear "lineage-sdk"; then
-applyPatch "$DOS_PATCHES/android_lineage-sdk/0001-Private_DNS-Migration.patch"; #Migrate Private DNS preset modes to hostname-mode based (heavily based off of a CalyxOS patch)
-fi;
-
-if enterAndClear "packages/apps/CarrierConfig2"; then
-sed -i '/overrides/d' Android.bp; #Don't replace CarrierConfig
-sed -i -e '31,35d;' AndroidManifest.xml; #Fixups
-rm src/app/grapheneos/carrierconfig2/TestActivity.java src/app/grapheneos/carrierconfig2/loader/CmpTest.java;
-if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then sed -i 's|etc/CarrierSettings|etc/CarrierSettings2|' src/app/grapheneos/carrierconfig2/loader/CSettingsDir.java; fi; #Alter the search path
-fi;
+# if enterAndClear "lineage-sdk"; then
+# applyPatch "$DOS_PATCHES/android_lineage-sdk/0001-Private_DNS-Migration.patch"; #Migrate Private DNS preset modes to hostname-mode based (heavily based off of a CalyxOS patch)
+# fi;
+# 
+# if enterAndClear "packages/apps/CarrierConfig2"; then
+# sed -i '/overrides/d' Android.bp; #Don't replace CarrierConfig
+# sed -i -e '31,35d;' AndroidManifest.xml; #Fixups
+# rm src/app/grapheneos/carrierconfig2/TestActivity.java src/app/grapheneos/carrierconfig2/loader/CmpTest.java;
+# if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then sed -i 's|etc/CarrierSettings|etc/CarrierSettings2|' src/app/grapheneos/carrierconfig2/loader/CSettingsDir.java; fi; #Alter the search path
+# fi;
 
 if enterAndClear "packages/apps/CellBroadcastReceiver"; then
 applyPatch "$DOS_PATCHES/android_packages_apps_CellBroadcastReceiver/0001-presidential_alert_toggle.patch"; #Allow toggling presidential alerts (GrapheneOS)
@@ -332,7 +330,6 @@ if [ "$DOS_DEBLOBBER_REMOVE_EUICC_FULL" = false ]; then applyPatch "$DOS_PATCHES
 if [ -d "$DOS_BUILD_BASE"/vendor/divested-carriersettings ]; then applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-CC2_Toggle.patch"; fi; #Add a toggle for CarrierConfig2 enablement (heavily based off of a GrapheneOS patch)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels.patch"; #Smart Pixels (CarbonROM/various)
 #applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0019-Smart_Pixels-a1.patch"; #Fix long click intent for Smart Pixels tile (crDroid/various)
-applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0018-disable_apps.patch"; #Add an ability to disable non-system apps from the "App info" screen (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_apps_Settings/0099-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL setting (GrapheneOS) # Ignore (dk)
 fi;
 
@@ -365,7 +362,7 @@ applyPatch "$DOS_PATCHES/android_packages_modules_Connectivity/0001-Network_Perm
 fi;
 
 if enterAndClear "packages/modules/DnsResolver"; then
-        applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Cache.patch"; #DnsResolver: Sort and cache hosts file data for fast lookup (tdm) # Rebased (dk)
+applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Cache.patch"; #DnsResolver: Sort and cache hosts file data for fast lookup (tdm)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0001-Hosts_Wildcards.patch"; #DnsResolver: Support wildcards in cached hosts file (tdm)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0002-hosts_toggle.patch"; #Add a toggle to disable /etc/hosts lookup (DivestOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_DnsResolver/0003-Reuse-align_ptr-in-hosts_cache.patch"; #Reuse align_ptr in hosts_cache (danielk43)
@@ -377,7 +374,7 @@ fi;
 
 if enterAndClear "packages/modules/Permission"; then
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permissions-1.patch"; #Add special handling for INTERNET/OTHER_SENSORS (GrapheneOS)
-applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permissions-2.patch"; #Fix usage UI summary for Network/Sensors (GrapheneOS) # Rebased (dk)
+applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0004-Special_Permissions-2.patch"; #Fix usage UI summary for Network/Sensors (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0005-Browser_No_Location.patch"; #Stop auto-granting location to system browsers (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0006-Location_Indicators.patch"; #SystemUI: Use new privacy indicators for location (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_packages_modules_Permission/0007-No_safety_center.patch"; #Disable Safety Center (GrapheneOS)
@@ -432,17 +429,17 @@ sed -i '/security\/lineage/d' config/*.mk; #Remove Lineage extra keys
 sed -i '/config_multiuserMaximumUsers/d' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
 sed -i '/config_locationExtraPackageNames/,+11d' overlay/common/frameworks/base/core/res/res/values/config.xml; #Conflict
 sed -i '/def_backup_transport/d' overlay/common/frameworks/base/packages/SettingsProvider/res/values/defaults.xml; #Unset default backup provider
-if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUDIOFX/,+3d' config/common_full.mk; fi; #Remove AudioFX
+if [ "$DOS_DEBLOBBER_REMOVE_AUDIOFX" = true ]; then sed -i '/TARGET_EXCLUDES_AUDIOFX/,+3d' config/common_mobile_full.mk; fi; #Remove AudioFX
 # sed -i 's/LINEAGE_BUILDTYPE := UNOFFICIAL/LINEAGE_BUILDTYPE := dos/' config/*.mk; #Change buildtype
 # echo 'include vendor/divested/divestos.mk' >> config/common.mk; #Include our customizations
 # cp -f "$DOS_PATCHES_COMMON/apns-conf.xml" prebuilt/common/etc/apns-conf.xml; #Update APN list
 cp -f "$DOS_PATCHES_COMMON/sensitive_pn.xml" prebuilt/common/etc/sensitive_pn.xml; #Update helplines
-sed -i '/Eleven/d' config/common_full.mk; #Remove Music Player
+sed -i '/Eleven/d' config/common_mobile_full.mk; #Remove Music Player
 sed -i '/enforce-product-packages-exist-internal/d' config/common.mk; #Ignore missing packages
 # cp -f "$DOS_PATCHES_COMMON/config_webview_packages.xml" overlay/common/frameworks/base/core/res/res/xml/config_webview_packages.xml; #Change allowed WebView providers
 sed -i '/com.android.vending/d' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml; #Remove unwanted apps
 sed -i '/com.google.android/d' overlay/common/frameworks/base/core/res/res/values/vendor_required_apps*.xml;
-sed -i "s/Aperture/SecureCamera/" config/common_full.mk;
+sed -i "s/Aperture/SecureCamera/" config/common_mobile_full.mk;
 sed -i "s/org.lineageos.aperture/app.grapheneos.camera/" overlay/common/frameworks/base/core/res/res/values/config.xml;
 sed -i "/Filter out random types/,/endif/d" config/version.mk; #Allow custom build types
 sed -i "s/Jelly/ChromePublic SystemWebview TrichromeChrome TrichromeLibrary TrichromeWebView CarrierConfig2/" config/common_mobile.mk; #Replace Jelly with Cromite browser
@@ -467,7 +464,7 @@ fi;
 #START OF DEVICE CHANGES
 #
 
-for codename in barbet gs101 gs201 lynx pantah raviole redbull # TODO: add the rest
+for codename in barbet bramble coral crosshatch gs101 gs201 lynx pantah raviole redbull redfin # TODO: add the rest
 do
   if enterAndClear "device/google/$codename"; then
     (sed -i "/PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS/d" aosp_$codename.mk aosp_common.mk; git commit -am "Disable mainline checking") || true
@@ -495,25 +492,15 @@ if enterAndClear "device/google/gs-common"; then
 rm -rfv widevine;
 fi;
 
-# # Patch pixel kernels here for now
-# for devicefamily in lynx pantah raviole redbull
-# do
-#   export devicefamily="${devicefamily}"
-#   if grep -q "$devicefamily" <<< "lynx pantah"; then
-#     if enterAndClear "device/google/${devicefamily}-kernel"; then
-#       "${GIT_LOCAL}"/DivestOS-Build/Scripts/"${BUILD_WORKING_DIR}"/CVE_Patchers/android_kernel_google_gs201_private_gs-google.sh
-#     fi;
-#   elif [[ "$devicefamily" == "raviole" ]]; then
-#     if enterAndClear "device/google/${devicefamily}-kernel"; then
-#       "${GIT_LOCAL}"/DivestOS-Build/Scripts/"${BUILD_WORKING_DIR}"/CVE_Patchers/android_kernel_google_gs101_private_gs-google.sh
-#     fi;
-#   elif [[ "$devicefamily" == "redbull" ]]; then
-#     if enterAndClear "kernel/google/${devicefamily}"; then
-#       "${GIT_LOCAL}"/DivestOS-Build/Scripts/"${BUILD_WORKING_DIR}"/CVE_Patchers/android_kernel_google_redbull.sh
-#     fi;
-#   fi
-#   unset devicefamily
-# done;
+# Patch pixel kernels here for now
+for devicefamily in msm-4.9 msm-4.14 redbull
+do
+  export devicefamily="${devicefamily}"
+  if enterAndClear "kernel/google/${devicefamily}"; then
+    "${GIT_LOCAL}"/DivestOS-Build/Scripts/"${BUILD_WORKING_DIR}"/CVE_Patchers/android_kernel_google_"${devicefamily}".sh
+  fi;
+  unset devicefamily
+done;
 
 cd "$DOS_BUILD_BASE"
 #Apply gesture input lib here for now

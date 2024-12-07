@@ -1,44 +1,58 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: danielk43 <11856117+danielk43@users.noreply.github.com>
-Date: Sat, 20 Jul 2024 13:03:21 -0400
+Date: Sat, 7 Dec 2024 17:51:11 -0500
 Subject: [PATCH] gs201: Remove modules
 
-Change-Id: I222a47f5a6caeac4e73c4c97586093e80eb2cda8
+Change-Id: I721120dabdcf78c30f0dd3dd6094c6ac051bc2d2
 ---
- conf/init.gs201.rc                                   |  1 -
- device.mk                                            |  5 -----
- lineage_common.mk                                    | 12 ------------
- .../frameworks/base/core/res/res/values/config.xml   |  3 +--
- sepolicy/widevine/file.te                            |  3 ---
- sepolicy/widevine/file_contexts                      |  5 -----
- sepolicy/widevine/hal_drm_clearkey.te                |  5 -----
- sepolicy/widevine/hal_drm_widevine.te                | 12 ------------
- sepolicy/widevine/service_contexts                   |  1 -
- 9 files changed, 1 insertion(+), 46 deletions(-)
+ device.mk                                     | 29 -------------------
+ lineage_common.mk                             | 10 -------
+ .../base/core/res/res/values/config.xml       |  3 +-
+ sepolicy/widevine/file.te                     |  3 --
+ sepolicy/widevine/file_contexts               |  5 ----
+ sepolicy/widevine/hal_drm_clearkey.te         |  5 ----
+ sepolicy/widevine/hal_drm_widevine.te         | 12 --------
+ sepolicy/widevine/service_contexts            |  1 -
+ 8 files changed, 1 insertion(+), 67 deletions(-)
  delete mode 100644 sepolicy/widevine/file.te
  delete mode 100644 sepolicy/widevine/file_contexts
  delete mode 100644 sepolicy/widevine/hal_drm_clearkey.te
  delete mode 100644 sepolicy/widevine/hal_drm_widevine.te
  delete mode 100644 sepolicy/widevine/service_contexts
 
-diff --git a/conf/init.gs201.rc b/conf/init.gs201.rc
-index 318c179c..cf324937 100644
---- a/conf/init.gs201.rc
-+++ b/conf/init.gs201.rc
-@@ -1,5 +1,4 @@
- import /vendor/etc/init/hw/init.gs201.usb.rc
--import android.hardware.drm@1.2-service.widevine.rc
- import init.exynos.sensorhub.rc
- 
- on early-init && property:ro.build.type=eng
 diff --git a/device.mk b/device.mk
-index 34e11645..4182c29d 100644
+index 8fd83d95..4fe55cc4 100644
 --- a/device.mk
 +++ b/device.mk
-@@ -529,11 +529,6 @@ PRODUCT_PACKAGES += \
- PRODUCT_PACKAGES += \
- 	VideoEditorGoogle
+@@ -32,7 +32,6 @@ include device/google/gs-common/gps/dump/log.mk
+ include device/google/gs-common/radio/dump.mk
+ include device/google/gs-common/umfw_stat/umfw_stat.mk
+ include device/google/gs-common/gear/dumpstate/aidl.mk
+-include device/google/gs-common/widevine/widevine.mk
+ include device/google/gs-common/sota_app/factoryota.mk
+ include device/google/gs-common/misc_writer/misc_writer.mk
+ include device/google/gs-common/gyotaku_app/gyotaku.mk
+@@ -449,12 +448,6 @@ PRODUCT_PACKAGES += \
+ PRODUCT_COPY_FILES += \
+ 	frameworks/native/data/etc/android.software.midi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.midi.xml
  
+-# eSIM MEP Feature
+-ifneq ($(DISABLE_TELEPHONY_EUICC),true)
+-PRODUCT_COPY_FILES += \
+-    frameworks/native/data/etc/android.hardware.telephony.euicc.mep.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.telephony.euicc.mep.xml
+-endif
+-
+ # default usb debug functions
+ ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
+ PRODUCT_PROPERTY_OVERRIDES += \
+@@ -525,15 +518,6 @@ PRODUCT_PACKAGES += \
+ PRODUCT_PACKAGES += \
+ 	libhwjpeg
+ 
+-# Video Editor
+-PRODUCT_PACKAGES += \
+-	VideoEditorGoogle
+-
 -# WideVine modules
 -include device/google/gs201/widevine/device.mk
 -PRODUCT_PACKAGES += \
@@ -47,26 +61,48 @@ index 34e11645..4182c29d 100644
  PANTHER_PRODUCT := %panther
  CHEETAH_PRODUCT := %cheetah
  LYNX_PRODUCT := %lynx
+@@ -851,9 +835,6 @@ endif
+ PRODUCT_PACKAGES += \
+ 	vndk-libs
+ 
+-PRODUCT_ENFORCE_RRO_TARGETS := \
+-	framework-res
+-
+ # Dynamic Partitions
+ PRODUCT_USE_DYNAMIC_PARTITIONS := true
+ 
+@@ -877,16 +858,6 @@ PRODUCT_PACKAGES += \
+ 	android.hardware.fastboot-service.pixel_recovery \
+ 	fastbootd
+ 
+-#google iwlan
+-PRODUCT_PACKAGES += \
+-	Iwlan
+-
+-#Iwlan test app for eng builds
+-ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
+-PRODUCT_PACKAGES += \
+-	IwlanTestApp
+-endif
+-
+ PRODUCT_PACKAGES += \
+ 	whitelist \
+ 	libstagefright_hdcp \
 diff --git a/lineage_common.mk b/lineage_common.mk
-index 89367c31..770dee40 100644
+index 9f980564..4475fe76 100644
 --- a/lineage_common.mk
 +++ b/lineage_common.mk
-@@ -16,14 +16,6 @@ PRODUCT_PRODUCT_PROPERTIES += \
+@@ -16,19 +16,9 @@ PRODUCT_PRODUCT_PROPERTIES += \
      ro.vendor.camera.extensions.package=com.google.android.apps.camera.services \
      ro.vendor.camera.extensions.service=com.google.android.apps.camera.services.extensions.service.PixelExtensions
  
--# GMS
--ifeq ($(WITH_GMS),true)
--GMS_MAKEFILE=gms_64bit_only.mk
--endif
--
 -# Google Assistant
 -PRODUCT_PRODUCT_PROPERTIES += ro.opa.eligible_device=true
 -
- # Lineage Health
- include hardware/google/pixel/lineage_health/device.mk
- 
-@@ -31,9 +23,5 @@ include hardware/google/pixel/lineage_health/device.mk
+-# Lineage Health
+-include hardware/google/pixel/lineage_health/device.mk
+-
+ # Linker config
  PRODUCT_VENDOR_LINKER_CONFIG_FRAGMENTS += \
      device/google/gs201/linker.config.json
  
