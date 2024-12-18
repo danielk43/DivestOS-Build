@@ -1,4 +1,4 @@
-From 96390a1cf081c668b2ee7fec1d6bbcf2cf538418 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: danielk43 <11856117+danielk43@users.noreply.github.com>
 Date: Sat, 7 Dec 2024 18:30:17 -0500
 Subject: [PATCH] crosshatch: Remove elmyrasvc
@@ -9,6 +9,7 @@ Change-Id: I388b8e9d5bfee7d3d1e2c89c8187e4248ce2adad
  1 file changed, 4 deletions(-)
 
 diff --git a/lineage.dependencies b/lineage.dependencies
+index 4141f979..95d57f04 100644
 --- a/lineage.dependencies
 +++ b/lineage.dependencies
 @@ -6,9 +6,5 @@
@@ -21,4 +22,3 @@ diff --git a/lineage.dependencies b/lineage.dependencies
 -    "target_path": "packages/apps/ElmyraService"
    }
  ]
-
