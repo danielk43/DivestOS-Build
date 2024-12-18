@@ -420,7 +420,7 @@ fi;
 #START OF DEVICE CHANGES
 #
 
-for codename in barbet bramble coral crosshatch gs101 gs201 lynx pantah raviole redbull redfin # TODO: add the rest
+for codename in barbet bramble coral crosshatch gs101 gs201 lynx pantah raviole redbull redfin shusky zuma # TODO: add the rest
 do
   if enterAndClear "device/google/$codename"; then
     (sed -i "/PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS/d" aosp_$codename.mk aosp_common.mk; git commit -am "Disable mainline checking") || true
