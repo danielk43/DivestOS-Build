@@ -186,7 +186,8 @@ applyPatch "$DOS_PATCHES/android_frameworks_base/0038-no-camera-lpad.patch"; #Do
 applyPatch "$DOS_PATCHES/android_frameworks_base/0040-euicc-integration.patch"; #Integrate Google's EuiccSupportPixel package (GrapheneOS)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0041-tile_restrictions.patch"; #SystemUI: Require unlocking to use sensitive QS tiles (GrapheneOS) # Rebased (dk)
 applyPatch "$DOS_PATCHES/android_frameworks_base/0042-minimal_screenshot_exif.patch"; #Put bare minimum metadata in screenshots (CalyxOS)
-applyPatch "$DOS_PATCHES/android_frameworks_base/0099-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS) # Ignore (dk)
+# applyPatch "$DOS_PATCHES/android_frameworks_base/0099-add-GNSS-SUPL-setting.patch"; #Add GNSS SUPL Setting (GrapheneOS)
+applyPatch "$DOS_PATCHES/android_frameworks_base/revert-6b793fa9.patch"; #Revert "Allow signature spoofing for microG Companion/Services"
 applyPatch "$DOS_PATCHES_COMMON/android_frameworks_base/0008-No_Crash_GSF.patch"; #Don't crash apps that depend on missing Gservices provider (GrapheneOS)
 hardenLocationConf services/core/java/com/android/server/location/gnss/gps_debug.conf; #Harden the default GPS config
 sed -i 's/DEFAULT_MAX_FILES = 1000;/DEFAULT_MAX_FILES = 0;/' services/core/java/com/android/server/DropBoxManagerService.java; #Disable DropBox internal logging service

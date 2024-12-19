@@ -17,7 +17,7 @@ Change-Id: I63acd724cfcdeba12bc2abfedd382d21842bba77
  delete mode 100644 services/core/jni/com_android_server_pm_ComputerEngine.cpp
 
 diff --git a/services/core/java/com/android/server/pm/AppsFilterImpl.java b/services/core/java/com/android/server/pm/AppsFilterImpl.java
-index 57263da936d6..cc4c2b5bf893 100644
+index a7fb42890a3e..c774c88f1da6 100644
 --- a/services/core/java/com/android/server/pm/AppsFilterImpl.java
 +++ b/services/core/java/com/android/server/pm/AppsFilterImpl.java
 @@ -36,7 +36,6 @@ import static com.android.server.pm.AppsFilterUtils.canQueryAsUpdateOwner;
@@ -28,19 +28,19 @@ index 57263da936d6..cc4c2b5bf893 100644
  
  import android.annotation.NonNull;
  import android.annotation.Nullable;
-@@ -600,7 +599,6 @@ public final class AppsFilterImpl extends AppsFilterLocked implements Watchable,
-             newIsForceQueryable = mForceQueryable.contains(newPkgSetting.getAppId())
+@@ -617,7 +616,6 @@ public final class AppsFilterImpl extends AppsFilterLocked implements Watchable,
                              /* shared user that is already force queryable */
                              || newPkgSetting.isForceQueryableOverride() /* adb override */
+                             || isMicroG
 -                            || (newPkg.isForceQueryable() && isMicrogSigned(newPkg))
                              || (newPkgSetting.isSystem() && (mSystemAppsQueryable
                              || newPkg.isForceQueryable()
                              || ArrayUtils.contains(mForceQueryableByDevicePackageNames,
 diff --git a/services/core/java/com/android/server/pm/ComputerEngine.java b/services/core/java/com/android/server/pm/ComputerEngine.java
-index 774033e0fb15..06b16becd3fe 100644
+index 2b3dbb2eb172..da1cf7a14ee3 100644
 --- a/services/core/java/com/android/server/pm/ComputerEngine.java
 +++ b/services/core/java/com/android/server/pm/ComputerEngine.java
-@@ -102,7 +102,6 @@ import android.content.pm.UserPackage;
+@@ -103,7 +103,6 @@ import android.content.pm.UserPackage;
  import android.content.pm.VersionedPackage;
  import android.os.Binder;
  import android.os.Build;
@@ -48,7 +48,7 @@ index 774033e0fb15..06b16becd3fe 100644
  import android.os.IBinder;
  import android.os.ParcelableException;
  import android.os.PatternMatcher;
-@@ -175,7 +174,6 @@ import java.util.Collections;
+@@ -177,7 +176,6 @@ import java.util.Collections;
  import java.util.Comparator;
  import java.util.List;
  import java.util.Objects;
@@ -56,7 +56,7 @@ index 774033e0fb15..06b16becd3fe 100644
  import java.util.Set;
  import java.util.UUID;
  
-@@ -425,10 +423,6 @@ public class ComputerEngine implements Computer {
+@@ -427,10 +425,6 @@ public class ComputerEngine implements Computer {
      private final PackageManagerInternal.ExternalSourcesPolicy mExternalSourcesPolicy;
      private final CrossProfileIntentResolverEngine mCrossProfileIntentResolverEngine;
  
@@ -67,7 +67,7 @@ index 774033e0fb15..06b16becd3fe 100644
      // PackageManagerService attributes that are primitives are referenced through the
      // pms object directly.  Primitives are the only attributes so referenced.
      protected final PackageManagerService mService;
-@@ -1471,53 +1465,6 @@ public class ComputerEngine implements Computer {
+@@ -1473,53 +1467,6 @@ public class ComputerEngine implements Computer {
          return result;
      }
  
@@ -121,7 +121,7 @@ index 774033e0fb15..06b16becd3fe 100644
      public final PackageInfo generatePackageInfo(PackageStateInternal ps,
              @PackageManager.PackageInfoFlagsBits long flags, int userId) {
          if (!mUserManager.exists(userId)) return null;
-@@ -1574,10 +1521,6 @@ public class ComputerEngine implements Computer {
+@@ -1592,10 +1539,6 @@ public class ComputerEngine implements Computer {
                  }
              }
  

@@ -137,7 +137,7 @@ index 57263da936d6..a7fb42890a3e 100644
                              || (newPkgSetting.isSystem() && (mSystemAppsQueryable
                              || newPkg.isForceQueryable()
 diff --git a/services/core/java/com/android/server/pm/ComputerEngine.java b/services/core/java/com/android/server/pm/ComputerEngine.java
-index cbe10c24f7eb..01c8cfc6fc4b 100644
+index cbe10c24f7eb..2b3dbb2eb172 100644
 --- a/services/core/java/com/android/server/pm/ComputerEngine.java
 +++ b/services/core/java/com/android/server/pm/ComputerEngine.java
 @@ -86,6 +86,7 @@ import android.content.pm.InstantAppResolveInfo;
@@ -237,10 +237,10 @@ index cbe10c24f7eb..01c8cfc6fc4b 100644
  
 +        if (SystemProperties.getBoolean(MICROG_ENABLEMENT, false)) {
 +            InstallSource installSource = ps.getInstallSource();
-+            if (installSource != null && installSource.installerPackageName != null
++            if (installSource != null && installSource.mInstallerPackageName != null
 +                    && mSettings.getPackage(PACKAGE_PLAY_STORE) != null
 +                    && callingUid != Process.SYSTEM_UID
-+                    && ArrayUtils.contains(PACKAGES_SPOOF_INSTALLSOURCE, installSource.installerPackageName)) {
++                    && ArrayUtils.contains(PACKAGES_SPOOF_INSTALLSOURCE, installSource.mInstallerPackageName)) {
 +                return InstallSource.create(PACKAGE_PLAY_STORE, PACKAGE_PLAY_STORE, PACKAGE_PLAY_STORE, null,
 +                                PackageInstaller.PACKAGE_SOURCE_STORE,
 +                                ps.getInstallSource().isOrphaned, false)
