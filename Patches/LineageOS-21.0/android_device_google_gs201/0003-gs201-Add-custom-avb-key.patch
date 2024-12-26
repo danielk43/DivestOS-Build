@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Sat, 7 Dec 2024 17:55:43 -0500
+Subject: [PATCH] gs201: Add custom avb key
+
+Change-Id: I7d84cbf64a72d6c8375387934f25914b34335013
+---
+ BoardConfig-common.mk | 12 ++++++------
+ BoardConfigLineage.mk |  7 ++++---
+ 2 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/BoardConfig-common.mk b/BoardConfig-common.mk
+index f1fe1d97..3d727ec3 100644
+--- a/BoardConfig-common.mk
++++ b/BoardConfig-common.mk
+@@ -146,8 +146,8 @@ $(call soong_config_set,arm_gralloc,gralloc_ion_sync_on_lock,$(BOARD_USES_GRALLO
+ 
+ # Enable chain partition for system.
+ BOARD_AVB_VBMETA_SYSTEM := system system_dlkm system_ext product
+-BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
+-BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
++BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA4096
+ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
+ 
+@@ -156,14 +156,14 @@ BOARD_AVB_VBMETA_SYSTEM += pvmfw
+ endif
+ 
+ # Enable chained vbmeta for boot images
+-BOARD_AVB_BOOT_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
+-BOARD_AVB_BOOT_ALGORITHM := SHA256_RSA2048
++BOARD_AVB_BOOT_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_BOOT_ALGORITHM := SHA256_RS4096
+ BOARD_AVB_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+ BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 2
+ 
+ # Enable chained vbmeta for init_boot images
+-BOARD_AVB_INIT_BOOT_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
+-BOARD_AVB_INIT_BOOT_ALGORITHM := SHA256_RSA2048
++BOARD_AVB_INIT_BOOT_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_INIT_BOOT_ALGORITHM := SHA256_RSA4096
+ BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+ BOARD_AVB_INIT_BOOT_ROLLBACK_INDEX_LOCATION := 4
+ 
+diff --git a/BoardConfigLineage.mk b/BoardConfigLineage.mk
+index 2a15f271..03e24efc 100644
+--- a/BoardConfigLineage.mk
++++ b/BoardConfigLineage.mk
+@@ -26,8 +26,8 @@ TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
+ 
+ # Enable chain partition for vendor.
+ BOARD_AVB_VBMETA_VENDOR := vendor
+-BOARD_AVB_VBMETA_VENDOR_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
+-BOARD_AVB_VBMETA_VENDOR_ALGORITHM := SHA256_RSA2048
++BOARD_AVB_VBMETA_VENDOR_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_VBMETA_VENDOR_ALGORITHM := SHA256_RSA4096
+ BOARD_AVB_VBMETA_VENDOR_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+ BOARD_AVB_VBMETA_VENDOR_ROLLBACK_INDEX_LOCATION := 3
+ 
+@@ -38,4 +38,5 @@ AB_OTA_PARTITIONS += \
+ -include vendor/lineage/config/BoardConfigReservedSize.mk
+ 
+ # Verified Boot
+-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
++BOARD_AVB_KEY_PATH := keys/$(PRODUCT_DEVICE)/avb.pem
++BOARD_AVB_ALGORITHM := SHA256_RSA4096

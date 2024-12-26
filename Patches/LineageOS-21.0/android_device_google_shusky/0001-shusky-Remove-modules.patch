@@ -1,0 +1,177 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Wed, 18 Dec 2024 18:46:05 -0500
+Subject: [PATCH] shusky: Remove modules
+
+Change-Id: I4e864f7c7e506ef2e7f6e378db0d16008c5bfd0d
+---
+ device-husky.mk      | 26 --------------------------
+ device-lineage.mk    |  8 --------
+ device-shiba.mk      | 26 --------------------------
+ husky/BoardConfig.mk |  1 -
+ husky/vendor.prop    |  7 -------
+ shiba/BoardConfig.mk |  1 -
+ shiba/vendor.prop    |  7 -------
+ 7 files changed, 76 deletions(-)
+
+diff --git a/device-husky.mk b/device-husky.mk
+index 14cdb2e..e44669c 100644
+--- a/device-husky.mk
++++ b/device-husky.mk
+@@ -284,16 +284,6 @@ PRODUCT_PACKAGES += \
+ 	WifiOverlay2023 \
+ 	PixelWifiOverlay2023
+ 
+-# Trusty liboemcrypto.so
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts
+-ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts/trusty/24Q1
+-else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts/trusty/24Q2
+-else
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts/trusty/trunk
+-endif
+-
+ # UWB
+ PRODUCT_SOONG_NAMESPACES += \
+     device/google/shusky/uwb
+@@ -322,22 +312,6 @@ PRODUCT_VENDOR_PROPERTIES += \
+ 	vendor.zram.size=50p \
+ 	persist.device_config.configuration.disable_rescue_party=true
+ 
+-# Fingerprint HAL
+-ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
+-APEX_FPS_TA_DIR := //vendor/google_devices/shusky/prebuilts/firmware/fingerprint/24Q1
+-else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
+-APEX_FPS_TA_DIR := //vendor/google_devices/shusky/prebuilts/firmware/fingerprint/24Q2
+-else
+-APEX_FPS_TA_DIR := //vendor/google_devices/shusky/prebuilts/firmware/fingerprint/trunk
+-endif
+-GOODIX_CONFIG_BUILD_VERSION := g7_trusty
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_common.mk)
+-ifeq ($(filter factory%, $(TARGET_PRODUCT)),)
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_shipping.mk)
+-else
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_factory.mk)
+-endif
+-
+ PRODUCT_VENDOR_PROPERTIES += \
+     persist.vendor.udfps.als_feed_forward_supported=true \
+     persist.vendor.udfps.lhbm_controlled_in_hal_supported=true
+diff --git a/device-lineage.mk b/device-lineage.mk
+index d738cf1..b2bd7f3 100644
+--- a/device-lineage.mk
++++ b/device-lineage.mk
+@@ -11,14 +11,6 @@ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
+ PRODUCT_PACKAGES += \
+     ANGLE
+ 
+-# EUICC
+-PRODUCT_COPY_FILES += \
+-    frameworks/native/data/etc/android.hardware.telephony.euicc.mep.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.telephony.euicc.mep.xml \
+-    frameworks/native/data/etc/android.hardware.telephony.euicc.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.telephony.euicc.xml
+-
+-PRODUCT_PACKAGES += \
+-    EuiccSupportPixelOverlay
+-
+ # Kernel
+ TARGET_PREBUILT_KERNEL := device/google/shusky-kernel/Image.lz4
+ 
+diff --git a/device-shiba.mk b/device-shiba.mk
+index 323fbcc..840aa4b 100644
+--- a/device-shiba.mk
++++ b/device-shiba.mk
+@@ -270,16 +270,6 @@ PRODUCT_PACKAGES += \
+ 	WifiOverlay2023 \
+ 	PixelWifiOverlay2023
+ 
+-# Trusty liboemcrypto.so
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts
+-ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts/trusty/24Q1
+-else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts/trusty/24Q2
+-else
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/shusky/prebuilts/trusty/trunk
+-endif
+-
+ # Location
+ # SDK build system
+ include device/google/gs-common/gps/brcm/device.mk
+@@ -304,22 +294,6 @@ PRODUCT_VENDOR_PROPERTIES += \
+ 	vendor.zram.size=50p \
+ 	persist.device_config.configuration.disable_rescue_party=true
+ 
+-# Fingerprint HAL
+-ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
+-APEX_FPS_TA_DIR := //vendor/google_devices/shusky/prebuilts/firmware/fingerprint/24Q1
+-else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
+-APEX_FPS_TA_DIR := //vendor/google_devices/shusky/prebuilts/firmware/fingerprint/24Q2
+-else
+-APEX_FPS_TA_DIR := //vendor/google_devices/shusky/prebuilts/firmware/fingerprint/trunk
+-endif
+-GOODIX_CONFIG_BUILD_VERSION := g7_trusty
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_common.mk)
+-ifeq ($(filter factory%, $(TARGET_PRODUCT)),)
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_shipping.mk)
+-else
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_factory.mk)
+-endif
+-
+ # Fingerprint exposure compensation
+ PRODUCT_VENDOR_PROPERTIES += \
+     persist.vendor.udfps.auto_exposure_compensation_supported=true
+diff --git a/husky/BoardConfig.mk b/husky/BoardConfig.mk
+index 1adcd18..62e6f80 100644
+--- a/husky/BoardConfig.mk
++++ b/husky/BoardConfig.mk
+@@ -18,7 +18,6 @@
+ BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
+ 
+ # The modules which need to be loaded in sequential
+-BOARD_KERNEL_CMDLINE += exynos_drm.load_sequential=1
+ BOARD_KERNEL_CMDLINE += g2d.load_sequential=1
+ BOARD_KERNEL_CMDLINE += samsung_iommu_v9.load_sequential=1
+ 
+diff --git a/husky/vendor.prop b/husky/vendor.prop
+index 894ec5d..d29502d 100644
+--- a/husky/vendor.prop
++++ b/husky/vendor.prop
+@@ -1,10 +1,3 @@
+-# DRM
+-drm.service.enabled=true
+-media.mediadrmservice.enable=true
+-
+-# Fingerprint
+-ro.vendor.fingerprint.ta.name=g7.app
+-
+ # Radio
+ persist.vendor.ril.ecc.use.xml=1
+ persist.vendor.ril.support_nr_ds=1
+diff --git a/shiba/BoardConfig.mk b/shiba/BoardConfig.mk
+index a094c3d..138b6a8 100644
+--- a/shiba/BoardConfig.mk
++++ b/shiba/BoardConfig.mk
+@@ -18,7 +18,6 @@
+ BOARD_BOOTCONFIG += androidboot.load_modules_parallel=true
+ 
+ # The modules which need to be loaded in sequential
+-BOARD_KERNEL_CMDLINE += exynos_drm.load_sequential=1
+ BOARD_KERNEL_CMDLINE += g2d.load_sequential=1
+ BOARD_KERNEL_CMDLINE += samsung_iommu_v9.load_sequential=1
+ 
+diff --git a/shiba/vendor.prop b/shiba/vendor.prop
+index 894ec5d..d29502d 100644
+--- a/shiba/vendor.prop
++++ b/shiba/vendor.prop
+@@ -1,10 +1,3 @@
+-# DRM
+-drm.service.enabled=true
+-media.mediadrmservice.enable=true
+-
+-# Fingerprint
+-ro.vendor.fingerprint.ta.name=g7.app
+-
+ # Radio
+ persist.vendor.ril.ecc.use.xml=1
+ persist.vendor.ril.support_nr_ds=1

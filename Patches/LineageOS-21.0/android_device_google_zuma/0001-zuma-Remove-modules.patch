@@ -1,0 +1,184 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Wed, 18 Dec 2024 18:29:54 -0500
+Subject: [PATCH] zuma: Remove modules
+
+Change-Id: Iadc8bb39f118d16830aefa7f22b87fb9426f7c08
+---
+ device.mk                                     | 23 -------------------
+ lineage_common.mk                             | 10 --------
+ .../base/core/res/res/values/config.xml       |  2 +-
+ parts/AndroidManifest.xml                     |  2 --
+ sepolicy/widevine/file.te                     |  3 ---
+ sepolicy/widevine/file_contexts               |  5 ----
+ sepolicy/widevine/hal_drm_clearkey.te         |  5 ----
+ sepolicy/widevine/hal_drm_widevine.te         | 12 ----------
+ sepolicy/widevine/service_contexts            |  1 -
+ 9 files changed, 1 insertion(+), 62 deletions(-)
+ delete mode 100644 sepolicy/widevine/file.te
+ delete mode 100644 sepolicy/widevine/file_contexts
+ delete mode 100644 sepolicy/widevine/hal_drm_clearkey.te
+ delete mode 100644 sepolicy/widevine/hal_drm_widevine.te
+ delete mode 100644 sepolicy/widevine/service_contexts
+
+diff --git a/device.mk b/device.mk
+index 826125a..8224c78 100644
+--- a/device.mk
++++ b/device.mk
+@@ -37,7 +37,6 @@ include device/google/gs-common/camera/dump.mk
+ include device/google/gs-common/radio/dump.mk
+ include device/google/gs-common/gear/dumpstate/aidl.mk
+ include device/google/gs-common/umfw_stat/umfw_stat.mk
+-include device/google/gs-common/widevine/widevine.mk
+ include device/google/gs-common/sota_app/factoryota.mk
+ include device/google/gs-common/misc_writer/misc_writer.mk
+ include device/google/gs-common/gyotaku_app/gyotaku.mk
+@@ -564,15 +563,6 @@ PRODUCT_PACKAGES += \
+ PRODUCT_PACKAGES += \
+ 	libhwjpeg
+ 
+-# Video Editor
+-PRODUCT_PACKAGES += \
+-	VideoEditorGoogle
+-
+-# WideVine modules
+-include device/google/zuma/widevine/device.mk
+-PRODUCT_PACKAGES += \
+-	liboemcrypto \
+-
+ RIPCURRENT_PRODUCT := %ripcurrent
+ ifneq (,$(filter $(RIPCURRENT_PRODUCT), $(TARGET_PRODUCT)))
+         LOCAL_TARGET_PRODUCT := ripcurrent
+@@ -869,9 +859,6 @@ endif
+ PRODUCT_PACKAGES += \
+ 	vndk-libs
+ 
+-PRODUCT_ENFORCE_RRO_TARGETS := \
+-	framework-res
+-
+ # Dynamic Partitions
+ PRODUCT_USE_DYNAMIC_PARTITIONS := true
+ 
+@@ -891,16 +878,6 @@ PRODUCT_PACKAGES += \
+ 	android.hardware.fastboot@1.1-impl.pixel \
+ 	fastbootd
+ 
+-#google iwlan
+-PRODUCT_PACKAGES += \
+-	Iwlan
+-
+-#Iwlan test app for eng builds
+-ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
+-PRODUCT_PACKAGES += \
+-	IwlanTestApp
+-endif
+-
+ PRODUCT_PACKAGES += \
+ 	whitelist \
+ 	libstagefright_hdcp \
+diff --git a/lineage_common.mk b/lineage_common.mk
+index f230b03..1643029 100644
+--- a/lineage_common.mk
++++ b/lineage_common.mk
+@@ -16,19 +16,9 @@ PRODUCT_PRODUCT_PROPERTIES += \
+     ro.vendor.camera.extensions.package=com.google.android.apps.camera.services \
+     ro.vendor.camera.extensions.service=com.google.android.apps.camera.services.extensions.service.PixelExtensions
+ 
+-# Google Assistant
+-PRODUCT_PRODUCT_PROPERTIES += ro.opa.eligible_device=true
+-
+-# Lineage Health
+-include hardware/google/pixel/lineage_health/device.mk
+-
+ # Linker config
+ PRODUCT_VENDOR_LINKER_CONFIG_FRAGMENTS += \
+     device/google/zuma/linker.config.json
+ 
+-# Parts
+-PRODUCT_PACKAGES += \
+-    GoogleParts
+-
+ # Touch
+ include hardware/google/pixel/touch/device.mk
+diff --git a/overlay/frameworks/base/core/res/res/values/config.xml b/overlay/frameworks/base/core/res/res/values/config.xml
+index 791de91..af556cf 100644
+--- a/overlay/frameworks/base/core/res/res/values/config.xml
++++ b/overlay/frameworks/base/core/res/res/values/config.xml
+@@ -149,7 +149,7 @@
+     <bool name="config_device_vt_available">true</bool>
+ 
+     <!-- Flag specifying whether WFC over IMS is availasble on device -->
+-    <bool name="config_device_wfc_ims_available">true</bool>
++    <bool name="config_device_wfc_ims_available">false</bool>
+ 
+     <!-- An integer representing a timeout value in milliseconds that will be used to delay a
+          radio power off command until IMS deregistration completes. If 0, this feature is disabled
+diff --git a/parts/AndroidManifest.xml b/parts/AndroidManifest.xml
+index b5c79ae..2d9ee7b 100644
+--- a/parts/AndroidManifest.xml
++++ b/parts/AndroidManifest.xml
+@@ -23,8 +23,6 @@
+     <queries>
+         <package android:name="com.google.android.gms" />
+         <package android:name="com.google.android.gsf" />
+-        <package android:name="com.google.android.euicc" />
+-        <package android:name="com.google.euiccpixel" />
+     </queries>
+ 
+     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+diff --git a/sepolicy/widevine/file.te b/sepolicy/widevine/file.te
+deleted file mode 100644
+index a1e4e0e..0000000
+--- a/sepolicy/widevine/file.te
++++ /dev/null
+@@ -1,3 +0,0 @@
+-# Widevine DRM
+-type mediadrm_vendor_data_file, file_type, data_file_type;
+-
+diff --git a/sepolicy/widevine/file_contexts b/sepolicy/widevine/file_contexts
+deleted file mode 100644
+index 92aed3c..0000000
+--- a/sepolicy/widevine/file_contexts
++++ /dev/null
+@@ -1,5 +0,0 @@
+-/vendor/bin/hw/android\.hardware\.drm-service\.widevine          u:object_r:hal_drm_widevine_exec:s0
+-/vendor/bin/hw/android\.hardware\.drm-service\.clearkey          u:object_r:hal_drm_clearkey_exec:s0
+-
+-# Data
+-/data/vendor/mediadrm(/.*)?                                      u:object_r:mediadrm_vendor_data_file:s0
+diff --git a/sepolicy/widevine/hal_drm_clearkey.te b/sepolicy/widevine/hal_drm_clearkey.te
+deleted file mode 100644
+index 0e0a5c2..0000000
+--- a/sepolicy/widevine/hal_drm_clearkey.te
++++ /dev/null
+@@ -1,5 +0,0 @@
+-type hal_drm_clearkey, domain;
+-type hal_drm_clearkey_exec, vendor_file_type, exec_type, file_type;
+-init_daemon_domain(hal_drm_clearkey)
+-
+-hal_server_domain(hal_drm_clearkey, hal_drm)
+diff --git a/sepolicy/widevine/hal_drm_widevine.te b/sepolicy/widevine/hal_drm_widevine.te
+deleted file mode 100644
+index 1ecfa92..0000000
+--- a/sepolicy/widevine/hal_drm_widevine.te
++++ /dev/null
+@@ -1,12 +0,0 @@
+-type hal_drm_widevine, domain;
+-type hal_drm_widevine_exec, vendor_file_type, exec_type, file_type;
+-init_daemon_domain(hal_drm_widevine)
+-
+-hal_server_domain(hal_drm_widevine, hal_drm)
+-
+-# L3
+-allow hal_drm_widevine mediadrm_vendor_data_file:file create_file_perms;
+-allow hal_drm_widevine mediadrm_vendor_data_file:dir create_dir_perms;
+-
+-# L1
+-allow hal_drm_widevine dmabuf_system_heap_device:chr_file r_file_perms;
+diff --git a/sepolicy/widevine/service_contexts b/sepolicy/widevine/service_contexts
+deleted file mode 100644
+index 6989dde..0000000
+--- a/sepolicy/widevine/service_contexts
++++ /dev/null
+@@ -1 +0,0 @@
+-android.hardware.drm.IDrmFactory/widevine    u:object_r:hal_drm_service:s0

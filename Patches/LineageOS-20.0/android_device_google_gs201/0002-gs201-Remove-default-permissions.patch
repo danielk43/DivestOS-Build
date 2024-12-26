@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Wed, 25 Oct 2023 20:27:29 -0400
+Subject: [PATCH] gs201: Remove default permissions
+
+Change-Id: I19e9b85cc45e689d525022ac0b5028f30c3ed2e4
+---
+ device.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/device.mk b/device.mk
+index 86ee3fe..4b9e31a 100644
+--- a/device.mk
++++ b/device.mk
+@@ -980,7 +980,6 @@ $(call inherit-product-if-exists, vendor/google/services/LyricCameraHAL/src/buil
+ $(call inherit-product-if-exists, vendor/google/camera/devices/whi/device-vendor.mk)
+ 
+ PRODUCT_COPY_FILES += \
+-	device/google/gs201/default-permissions.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/default-permissions/default-permissions.xml \
+ 	device/google/gs201/component-overrides.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sysconfig/component-overrides.xml
+ 
+ # modem logging configs

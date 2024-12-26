@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Sat, 7 Dec 2024 14:15:35 -0500
+Subject: [PATCH] barbet: Remove modules
+
+Change-Id: I538067bf080f950e8db6f23154ee7abb5f5319c1
+---
+ device-lineage.mk                 | 3 ---
+ sepolicy/tracking_denials/bug_map | 1 -
+ 2 files changed, 4 deletions(-)
+
+diff --git a/device-lineage.mk b/device-lineage.mk
+index dbf47b3..105d0c7 100644
+--- a/device-lineage.mk
++++ b/device-lineage.mk
+@@ -10,6 +10,3 @@ $(call inherit-product, device/google/redbull/device-lineage.mk)
+ PRODUCT_PACKAGES += \
+     android.hardware.camera.provider@2.7-service-google
+ 
+-# HBM
+-PRODUCT_PACKAGES += \
+-    HbmSVManagerOverlay
+diff --git a/sepolicy/tracking_denials/bug_map b/sepolicy/tracking_denials/bug_map
+index c13bf90..c70a576 100644
+--- a/sepolicy/tracking_denials/bug_map
++++ b/sepolicy/tracking_denials/bug_map
+@@ -1,5 +1,4 @@
+ crash_dump selinuxfs file b/314720993
+ dumpstate incident process b/238571134
+-hal_drm_widevine default_prop file b/238263941
+ system_server vendor_incremental_module file b/264483452
+ vndservicemanager hal_keymaster_citadel binder b/307863674

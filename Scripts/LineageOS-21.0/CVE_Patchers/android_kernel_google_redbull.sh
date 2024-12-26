@@ -1,5 +1,6 @@
 #!/bin/bash
-if cd "$DOS_BUILD_BASE""kernel/google/redbull"; then
+if cd "$DOS_BUILD_BASE/kernel/google/redbull"; then
+git reset --hard && git clean -ffdx
 git apply $DOS_PATCHES_LINUX_CVES/0003-syzkaller-Misc/ANY/0008.patch
 git apply $DOS_PATCHES_LINUX_CVES/0005-Graphene-Deny_USB/4.19/0004.patch
 git apply $DOS_PATCHES_LINUX_CVES/0008-Graphene-Kernel_Hardening-allocsize/4.19/0003.patch

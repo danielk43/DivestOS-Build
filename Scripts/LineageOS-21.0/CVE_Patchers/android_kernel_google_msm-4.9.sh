@@ -1,5 +1,6 @@
 #!/bin/bash
-if cd "$DOS_BUILD_BASE""kernel/google/msm-4.9"; then
+if cd "$DOS_BUILD_BASE/kernel/google/msm-4.9"; then
+git reset --hard && git clean -ffdx
 git apply $DOS_PATCHES_LINUX_CVES/0002-Misc_Fixes-Steam/4.14/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/0005-Graphene-Deny_USB/4.9/0002.patch
 git apply $DOS_PATCHES_LINUX_CVES/0008-Graphene-Kernel_Hardening-allocsize/4.9/0001.patch

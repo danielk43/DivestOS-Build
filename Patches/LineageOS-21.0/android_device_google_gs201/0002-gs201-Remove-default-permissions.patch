@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Sat, 20 Jul 2024 13:04:16 -0400
+Subject: [PATCH] gs201: Remove default permissions
+
+Change-Id: Iace2da395a92607c4d4a92bc6e46f31bf65c7a97
+---
+ device.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/device.mk b/device.mk
+index 4fe55cc4..bdfdee04 100644
+--- a/device.mk
++++ b/device.mk
+@@ -951,7 +951,6 @@ include device/google/gs-common/sensors/sensors.mk
+ $(call soong_config_set,usf,target_soc,gs201)
+ 
+ PRODUCT_COPY_FILES += \
+-	device/google/gs201/default-permissions.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/default-permissions/default-permissions.xml \
+ 	device/google/gs201/component-overrides.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sysconfig/component-overrides.xml
+ 
+ # modem logging configs

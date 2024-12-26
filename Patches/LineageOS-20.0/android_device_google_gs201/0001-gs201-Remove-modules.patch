@@ -1,0 +1,186 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Wed, 25 Oct 2023 23:19:55 -0400
+Subject: [PATCH] gs201: Remove modules
+
+Change-Id: I8ca38e274c43c5258c20c9e9bf53bf1cdfe151ba
+---
+ conf/init.gs201.rc                                   |  1 -
+ device.mk                                            |  5 -----
+ lineage_common.mk                                    | 12 ------------
+ .../frameworks/base/core/res/res/values/config.xml   |  3 +--
+ sepolicy/tracking_denials/bug_map                    |  1 -
+ sepolicy/tracking_denials/hal_drm_widevine.te        |  2 --
+ sepolicy/widevine/file.te                            |  3 ---
+ sepolicy/widevine/file_contexts                      |  5 -----
+ sepolicy/widevine/hal_drm_clearkey.te                |  5 -----
+ sepolicy/widevine/hal_drm_widevine.te                | 12 ------------
+ sepolicy/widevine/service_contexts                   |  1 -
+ widevine/device.mk                                   |  4 ----
+ 12 files changed, 1 insertion(+), 53 deletions(-)
+ delete mode 100644 sepolicy/tracking_denials/hal_drm_widevine.te
+ delete mode 100644 sepolicy/widevine/file.te
+ delete mode 100644 sepolicy/widevine/file_contexts
+ delete mode 100644 sepolicy/widevine/hal_drm_clearkey.te
+ delete mode 100644 sepolicy/widevine/hal_drm_widevine.te
+ delete mode 100644 sepolicy/widevine/service_contexts
+ delete mode 100644 widevine/device.mk
+
+diff --git a/conf/init.gs201.rc b/conf/init.gs201.rc
+index 96dec81..8047399 100644
+--- a/conf/init.gs201.rc
++++ b/conf/init.gs201.rc
+@@ -1,5 +1,4 @@
+ import /vendor/etc/init/hw/init.gs201.usb.rc
+-import android.hardware.drm@1.2-service.widevine.rc
+ import init.exynos.sensorhub.rc
+ 
+ on early-init && property:ro.build.type=eng
+diff --git a/device.mk b/device.mk
+index 2d02158..86ee3fe 100644
+--- a/device.mk
++++ b/device.mk
+@@ -495,11 +495,6 @@ PRODUCT_PACKAGES += \
+ PRODUCT_PACKAGES += \
+ 	VideoEditorGoogle
+ 
+-# WideVine modules
+-include device/google/gs201/widevine/device.mk
+-PRODUCT_PACKAGES += \
+-	liboemcrypto \
+-
+ PANTHER_PRODUCT := %panther
+ CHEETAH_PRODUCT := %cheetah
+ LYNX_PRODUCT := %lynx
+diff --git a/lineage_common.mk b/lineage_common.mk
+index 431977d..5515c46 100644
+--- a/lineage_common.mk
++++ b/lineage_common.mk
+@@ -16,20 +16,8 @@ PRODUCT_PRODUCT_PROPERTIES += \
+     ro.vendor.camera.extensions.package=com.google.android.apps.camera.services \
+     ro.vendor.camera.extensions.service=com.google.android.apps.camera.services.extensions.service.PixelExtensions
+ 
+-# GMS
+-ifeq ($(WITH_GMS),true)
+-GMS_MAKEFILE=gms_64bit_only.mk
+-endif
+-
+-# Google Assistant
+-PRODUCT_PRODUCT_PROPERTIES += ro.opa.eligible_device=true
+-
+ # Lineage Health
+ include hardware/google/pixel/lineage_health/device.mk
+ 
+-# Parts
+-PRODUCT_PACKAGES += \
+-    GoogleParts
+-
+ # Touch
+ include hardware/google/pixel/touch/device.mk
+diff --git a/overlay/frameworks/base/core/res/res/values/config.xml b/overlay/frameworks/base/core/res/res/values/config.xml
+index a450361..5d6c344 100644
+--- a/overlay/frameworks/base/core/res/res/values/config.xml
++++ b/overlay/frameworks/base/core/res/res/values/config.xml
+@@ -149,7 +149,7 @@
+     <bool name="config_device_vt_available">true</bool>
+ 
+     <!-- Flag specifying whether WFC over IMS is availasble on device -->
+-    <bool name="config_device_wfc_ims_available">true</bool>
++    <bool name="config_device_wfc_ims_available">false</bool>
+ 
+     <!-- An integer representing a timeout value in milliseconds that will be used to delay a
+          radio power off command until IMS deregistration completes. If 0, this feature is disabled
+@@ -279,7 +279,6 @@
+      components, such as the telephony stack, which require access to the full ServiceState for
+      tasks such as network registration. -->
+     <string-array name="config_serviceStateLocationAllowedPackages">
+-        <item>"com.shannon.imsservice"</item>
+         <item>"com.android.phone"</item>
+     </string-array>
+ 
+diff --git a/sepolicy/tracking_denials/bug_map b/sepolicy/tracking_denials/bug_map
+index fcebf54..ec7cdfd 100644
+--- a/sepolicy/tracking_denials/bug_map
++++ b/sepolicy/tracking_denials/bug_map
+@@ -2,7 +2,6 @@ hal_input_processor_default vendor_display_prop file b/236200710
+ cat_engine_service_app system_app_data_file dir b/238705599
+ dumpstate app_zygote process b/237491813
+ dumpstate hal_input_processor_default process b/238260726
+-hal_drm_widevine default_prop file b/237492145
+ hal_googlebattery dumpstate fd b/238260742
+ hal_power_default hal_power_default capability b/237492146
+ hal_radioext_default radio_vendor_data_file file b/237093466
+diff --git a/sepolicy/tracking_denials/hal_drm_widevine.te b/sepolicy/tracking_denials/hal_drm_widevine.te
+deleted file mode 100644
+index cfe7fcf..0000000
+--- a/sepolicy/tracking_denials/hal_drm_widevine.te
++++ /dev/null
+@@ -1,2 +0,0 @@
+-# b/229209076
+-dontaudit hal_drm_widevine vndbinder_device:chr_file { read };
+diff --git a/sepolicy/widevine/file.te b/sepolicy/widevine/file.te
+deleted file mode 100644
+index a1e4e0e..0000000
+--- a/sepolicy/widevine/file.te
++++ /dev/null
+@@ -1,3 +0,0 @@
+-# Widevine DRM
+-type mediadrm_vendor_data_file, file_type, data_file_type;
+-
+diff --git a/sepolicy/widevine/file_contexts b/sepolicy/widevine/file_contexts
+deleted file mode 100644
+index 92aed3c..0000000
+--- a/sepolicy/widevine/file_contexts
++++ /dev/null
+@@ -1,5 +0,0 @@
+-/vendor/bin/hw/android\.hardware\.drm-service\.widevine          u:object_r:hal_drm_widevine_exec:s0
+-/vendor/bin/hw/android\.hardware\.drm-service\.clearkey          u:object_r:hal_drm_clearkey_exec:s0
+-
+-# Data
+-/data/vendor/mediadrm(/.*)?                                      u:object_r:mediadrm_vendor_data_file:s0
+diff --git a/sepolicy/widevine/hal_drm_clearkey.te b/sepolicy/widevine/hal_drm_clearkey.te
+deleted file mode 100644
+index 0e0a5c2..0000000
+--- a/sepolicy/widevine/hal_drm_clearkey.te
++++ /dev/null
+@@ -1,5 +0,0 @@
+-type hal_drm_clearkey, domain;
+-type hal_drm_clearkey_exec, vendor_file_type, exec_type, file_type;
+-init_daemon_domain(hal_drm_clearkey)
+-
+-hal_server_domain(hal_drm_clearkey, hal_drm)
+diff --git a/sepolicy/widevine/hal_drm_widevine.te b/sepolicy/widevine/hal_drm_widevine.te
+deleted file mode 100644
+index 1ecfa92..0000000
+--- a/sepolicy/widevine/hal_drm_widevine.te
++++ /dev/null
+@@ -1,12 +0,0 @@
+-type hal_drm_widevine, domain;
+-type hal_drm_widevine_exec, vendor_file_type, exec_type, file_type;
+-init_daemon_domain(hal_drm_widevine)
+-
+-hal_server_domain(hal_drm_widevine, hal_drm)
+-
+-# L3
+-allow hal_drm_widevine mediadrm_vendor_data_file:file create_file_perms;
+-allow hal_drm_widevine mediadrm_vendor_data_file:dir create_dir_perms;
+-
+-# L1
+-allow hal_drm_widevine dmabuf_system_heap_device:chr_file r_file_perms;
+diff --git a/sepolicy/widevine/service_contexts b/sepolicy/widevine/service_contexts
+deleted file mode 100644
+index 6989dde..0000000
+--- a/sepolicy/widevine/service_contexts
++++ /dev/null
+@@ -1 +0,0 @@
+-android.hardware.drm.IDrmFactory/widevine    u:object_r:hal_drm_service:s0
+diff --git a/widevine/device.mk b/widevine/device.mk
+deleted file mode 100644
+index cd75ade..0000000
+--- a/widevine/device.mk
++++ /dev/null
+@@ -1,4 +0,0 @@
+-PRODUCT_PACKAGES += \
+-	android.hardware.drm-service.clearkey \
+-	android.hardware.drm-service.widevine
+-BOARD_VENDOR_SEPOLICY_DIRS += device/google/gs201/sepolicy/widevine

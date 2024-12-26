@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: danielk43 <11856117+danielk43@users.noreply.github.com>
+Date: Sat, 7 Dec 2024 17:35:23 -0500
+Subject: [PATCH] lynx: Remove modules
+
+Change-Id: Ibcf438c5759e8dae1104f3f47ef57af7a1b50e3e
+---
+ device-lineage.mk | 11 -----------
+ device-lynx.mk    | 26 --------------------------
+ vendor.prop       |  7 -------
+ 3 files changed, 44 deletions(-)
+
+diff --git a/device-lineage.mk b/device-lineage.mk
+index 07ca0cb..6e6860a 100644
+--- a/device-lineage.mk
++++ b/device-lineage.mk
+@@ -11,17 +11,6 @@ DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
+ PRODUCT_PACKAGES += \
+     ANGLE
+ 
+-# EUICC
+-PRODUCT_COPY_FILES += \
+-    frameworks/native/data/etc/android.hardware.telephony.euicc.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.telephony.euicc.xml
+-
+-PRODUCT_PACKAGES += \
+-    EuiccSupportPixelOverlay
+-
+-# HBM
+-PRODUCT_PACKAGES += \
+-    HbmSVManagerOverlayLynx
+-
+ # Kernel
+ TARGET_PREBUILT_KERNEL := device/google/lynx-kernel/Image.lz4
+ 
+diff --git a/device-lynx.mk b/device-lynx.mk
+index 02c596c..79cd605 100644
+--- a/device-lynx.mk
++++ b/device-lynx.mk
+@@ -155,22 +155,6 @@ include device/google/lynx/bluetooth/qti_default.mk
+ # 	ro.hardware.keystore=software \
+ # 	ro.hardware.gatekeeper=software
+ 
+-# Fingerprint HAL
+-GOODIX_CONFIG_BUILD_VERSION := g7_trusty
+-ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts/firmware/fingerprint/24Q1
+-else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts/firmware/fingerprint/24Q2
+-else
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts/firmware/fingerprint/trunk
+-endif
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_common.mk)
+-ifeq ($(filter factory%, $(TARGET_PRODUCT)),)
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_shipping.mk)
+-else
+-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_factory.mk)
+-endif
+-
+ # Vibrator HAL
+ ADAPTIVE_HAPTICS_FEATURE := adaptive_haptics_v1
+ PRODUCT_VENDOR_PROPERTIES += \
+@@ -183,16 +167,6 @@ PRODUCT_VENDOR_PROPERTIES += \
+ 	persist.vendor.vibrator.hal.context.cooldowntime=1600 \
+ 	persist.vendor.vibrator.hal.context.settlingtime=5000
+ 
+-# Trusty liboemcrypto.so
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts
+-ifneq (,$(filter AP1%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts/trusty/24Q1
+-else ifneq (,$(filter AP2% AP3%,$(RELEASE_PLATFORM_VERSION)))
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts/trusty/24Q2
+-else
+-PRODUCT_SOONG_NAMESPACES += vendor/google_devices/lynx/prebuilts/trusty/trunk
+-endif
+-
+ # GPS xml
+ ifneq (,$(filter eng, $(TARGET_BUILD_VARIANT)))
+         PRODUCT_COPY_FILES += \
+diff --git a/vendor.prop b/vendor.prop
+index b20a249..ef817a7 100644
+--- a/vendor.prop
++++ b/vendor.prop
+@@ -1,10 +1,3 @@
+-# DRM
+-drm.service.enabled=true
+-media.mediadrmservice.enable=true
+-
+-# Fingerprint
+-ro.vendor.fingerprint.ta.name=g7.app
+-
+ # Radio
+ persist.vendor.ril.ecc.use.xml=1
+ persist.vendor.ril.support_nr_ds=1
