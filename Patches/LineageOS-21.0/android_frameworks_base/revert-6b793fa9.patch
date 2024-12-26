@@ -37,7 +37,7 @@ index a7fb42890a3e..c774c88f1da6 100644
                              || newPkg.isForceQueryable()
                              || ArrayUtils.contains(mForceQueryableByDevicePackageNames,
 diff --git a/services/core/java/com/android/server/pm/ComputerEngine.java b/services/core/java/com/android/server/pm/ComputerEngine.java
-index 2b3dbb2eb172..da1cf7a14ee3 100644
+index e2f8666f5933..56f0d7282cf9 100644
 --- a/services/core/java/com/android/server/pm/ComputerEngine.java
 +++ b/services/core/java/com/android/server/pm/ComputerEngine.java
 @@ -103,7 +103,6 @@ import android.content.pm.UserPackage;
